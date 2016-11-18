@@ -1,0 +1,704 @@
+
+
+<!doctype html>
+<html lang="en" dir="ltr" prefix="fb: //www.facebook.com/2008/fbml">
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="shortcut icon" href="https://www.archives.gov/files/favicon.ico" type="image/vnd.microsoft.icon" />
+<meta name="description" content="Help us transcribe some of the millions of digitized pages of records in the  National Archives Catalog. Transcription is an important way for us to improve search results and increase accessibility to our historical records." />
+<meta name="generator" content="Drupal 7 (http://drupal.org)" />
+<link rel="canonical" href="https://www.archives.gov/citizen-archivist/transcribe" />
+<meta property="og:site_name" content="National Archives" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.archives.gov/citizen-archivist/transcribe" />
+<meta property="og:title" content="Transcribe | Citizen Archivist" />
+<meta property="og:description" content="Help us transcribe some of the millions of digitized pages of records in the  National Archives Catalog. Transcription is an important way for us to improve search results and increase accessibility to our historical records." />
+<meta property="og:updated_time" content="2016-10-21T09:01:41-04:00" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:url" content="https://www.archives.gov/citizen-archivist/transcribe" />
+<meta name="twitter:title" content="Transcribe | Citizen Archivist" />
+<meta name="twitter:description" content="Help us transcribe some of the millions of digitized pages of records in the  National Archives Catalog. Transcription is an important way for us to improve search results and increase accessibility to our historical records." />
+<meta property="article:published_time" content="2016-08-15T17:37:08-04:00" />
+<meta property="article:modified_time" content="2016-10-21T09:01:41-04:00" />
+  <title>Transcribe | Citizen Archivist | National Archives</title>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+		
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+      <script type="text/javascript" language="javascript">
+         $(document).ready(function() {
+         	$('#loading').html('<p>Searching for an image to transcribe...</p>');
+         	$('#loading').hide();
+         	$("#tagappear").hide();
+         	$("#skip").hide();
+         	$("#next").hide();
+            $("#input").click(function(event){
+         	$("#loading").show();
+         	$('#username').hide();
+         	$('#password').hide();
+         	$('#loginmessage').hide();
+         	$('#input').hide();
+         	$('#loggingin').html('<p><font color="#FFC200" size="5">&#x25CF;</font> Logging in to the system...</p>');
+            var username = $('#username').val();
+            var password = $('#password').val();
+			offset = 0;
+			n = 1;
+            
+			function displayimage() {
+			
+			$.post('https://catalog.archives.gov/api/v1/login', {user: username, password: password}, function(t) {
+					credential = t.opaResponse.credentials;
+					$.getJSON('https://catalog.archives.gov/OpaAPI/iapi/v1?SearchType=advanced&action=contentDetail&f.tagsKeywordsAdv=hng-ts1&facet=true&facet.fields=oldScope,level,materialsType,fileFormat,locationIds,dateRangeFacet&highlight=true&offset=' + offset + '&q=*:*&tabType=all', function(o) {
+					attempt(n);
+					function attempt() {
+					mime = o.opaResponse.content.objects.objects.object[n].file['@mime'];
+					objectid = o.opaResponse.content.objects.objects.object[n]['@id'];
+					naid = o.opaResponse['@naId'];
+					title = o.opaResponse['@title'];
+					path = o.opaResponse.content.objects.objects.object[n].file['@path'];
+					url = 'https://catalog.archives.gov/OpaAPI/media/' + naid + '/' + path;
+					page = o.opaResponse.content.objects.objects.object[n]['@objectSortNum'];
+					try {
+					transcription = o.opaResponse.content.objects.objects.object[n].publicContributions.transcription.text;
+					n = n + 1;
+					$("#skip").show();
+					attempt(n);
+					}
+					catch(err) {
+					transcription = ''
+					$('#loggedin').html('<font color="green" size="5">&#x25CF;</font> Success: You are now logged in as <a href="https://catalog.archives.gov/accounts/' + username + '/contributions?contributionType=transcriptions">' + username + '.');
+					$('#transcribeimage').html('"' + title + '" (NAID <a href="https://catalog.archives.gov/id/' + naid + '">' + naid + '</a>, page <a href="https://catalog.archives.gov/id/' + naid + '/' + page + '/public?contributionType=transcription">' + page + '</a>)<br/><img src="' + url + '" width="600" />');
+					$('#tagtext').val(transcription);
+					$("#tagappear").show();
+					
+         			$("#skip").show();
+         			$("#next").show();
+					$("#hide").hide();
+					
+					
+					 $("#tag").click(function(event){
+					 var tagtext = $('#tagtext').val();
+					 $.ajax({
+    						beforeSend: function(request) {
+						        request.setRequestHeader('Authorization', credential);
+    							},
+    						dataType: "json",
+					 url: 'https://catalog.archives.gov/api/v1/id/' + naid + '/objects/' + objectid + '/transcriptions?text=' + tagtext,
+					 method: 'PUT'
+					 });
+					 $('#test').html('Success!<br/>' + tagtext + '<br/>' + credential);
+					 });
+					 }
+					 }
+               		});
+						}, 'json')
+						.fail(function() {
+						$('#login').html('<p>Invalid password and/or username. Please retry.</p>');
+						});
+					}
+				displayimage(username, password, offset, n);
+				$("#skip").click(function(event){
+				offset = offset + 1;
+				displayimage(username, password, offset, n);
+				});
+				$("#next").click(function(event){
+				n = n + 1;
+				displayimage(n);
+				});
+						
+         });
+         });
+      </script>
+
+<!-- Google Tag Manager -->
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+
+})(window,document,'script','dataLayer','GTM-WLMC86');</script>
+
+<!-- End Google Tag Manager -->
+
+
+  <link type="text/css" rel="stylesheet" href="https://www.archives.gov/files/css/css_lQaZfjVpwP_oGNqdtWCSpJT1EMqXdMiU84ekLLxQnc4.css" media="all" />
+<link type="text/css" rel="stylesheet" href="https://www.archives.gov/files/css/css_8wte7oTDhlXydbX8hJ97aPBH8iqGMaF19shlNNgLHyE.css" media="all" />
+<link type="text/css" rel="stylesheet" href="https://www.archives.gov/files/css/css_Wu8npAzy16WmnnnWKxpexfgsAryolGGaX6yO3GWA5bU.css" media="all" />
+<style>.section-theme #title-bar{background:#665184 url("https://www.archives.gov/files/global-images/section-headers/generic1.png") no-repeat center right;}.section-theme #mega-footer > h2{background:#665184}.section-theme #title-bar .breadcrumb{background-color:rgba(133,105,172,0.5);}.section-theme th{background-color:#665184 !important;}.section-theme .btn-primary{background-color:#665184;border-color:#665184;}.section-theme .btn-primary:focus,.section-theme .btn-primary:hover,.section-theme .btn-primary:active,.section-theme .btn-primary:visited{background-color:rgba(133,105,172,0.5);color:#fff;}
+    * {
+       margin: 0; 
+       padding: 0;
+     }
+
+     div#banner { 
+       position: absolute; 
+       top: 0; 
+       left: 0; 
+       background-color: pink; 
+       width: 100%; 
+     }
+     div#banner-content { 
+       margin: 0 auto; 
+       padding: 10px; 
+       border: 1px solid #000;
+     }
+     div#main-content { 
+       padding-top: 70px;
+    }
+</style>
+<link type="text/css" rel="stylesheet" href="https://www.archives.gov/files/css/css_fTQsbytNC1jcf0C4rMYrH4D5624NzActpy_zaWjp1bs.css" media="all" />
+  <!-- HTML5 element support for IE6-8 -->
+  <!--[if lt IE 9]>
+    <script src="https://www.archives.gov//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,300italic,400italic%7CEB+Garamond">
+  <script src="https://www.archives.gov/files/js/js_jpJjaUC0z8JMIyav5oQrYykDRUb64rpaUDpB4Y9aklU.js"></script>
+<script src="https://www.archives.gov/files/js/js_3uSWpNXzcooNkrtkF_WB_yiOj40ENqEFt9oEOw0QHY0.js"></script>
+<script src="https://www.archives.gov/files/js/js_xnB-GOLN98AkSQeg8eTz5CVdac28LxKvicVfWXSIt5Y.js"></script>
+<script src="https://www.archives.gov/files/js/js_MVryip7iuKF3q2ibd0LSiNm7K01HFn4ieeD6BT-LTBY.js"></script>
+<script>jQuery.extend(Drupal.settings, {"basePath":"\/","pathPrefix":"","ajaxPageState":{"theme":"nara","theme_token":"Iod7ee0JHjYwUdrVEYd7FhnnX7iuyX96wcyiUtnPlVw","js":{"sites\/all\/themes\/bootstrap\/js\/bootstrap.js":1,"sites\/all\/modules\/contrib\/jquery_update\/replace\/jquery\/1.7\/jquery.min.js":1,"misc\/jquery.once.js":1,"misc\/drupal.js":1,"sites\/all\/modules\/custom\/archives_ui\/scripts\/helptext.js":1,"sites\/all\/modules\/contrib\/user_alert\/js\/user-alert.js":1,"sites\/all\/modules\/custom\/nara_custom\/js\/nara_custom.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/affix.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/alert.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/button.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/carousel.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/collapse.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/dropdown.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/modal.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/tooltip.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/popover.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/scrollspy.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/tab.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/transition.js":1,"sites\/all\/themes\/nara\/scripts\/jPanelMenu.js":1,"sites\/all\/themes\/nara\/scripts\/jRespond.js":1,"sites\/all\/themes\/nara\/scripts\/matchHeight.min.js":1,"sites\/all\/themes\/nara\/scripts\/jquery.fancybox.pack.js":1,"sites\/all\/themes\/nara\/scripts\/toc.js":1,"sites\/all\/themes\/nara\/scripts\/scripts.js":1,"sites\/all\/themes\/nara\/scripts\/jquery.scrollTo.js":1},"css":{"modules\/system\/system.base.css":1,"sites\/all\/modules\/contrib\/ldap\/ldap_user\/ldap_user.css":1,"sites\/all\/modules\/custom\/archives_ui\/css\/font-awesome.min.css":1,"sites\/all\/modules\/custom\/archives_ui\/css\/helptext.css":1,"sites\/all\/modules\/custom\/archives_ui\/css\/ckeditor_custom.css":1,"sites\/all\/modules\/contrib\/calendar\/css\/calendar_multiday.css":1,"sites\/all\/modules\/contrib\/date\/date_api\/date.css":1,"sites\/all\/modules\/contrib\/date\/date_popup\/themes\/datepicker.1.7.css":1,"sites\/all\/modules\/contrib\/date\/date_repeat_field\/date_repeat_field.css":1,"modules\/field\/theme\/field.css":1,"modules\/node\/node.css":1,"sites\/all\/modules\/contrib\/user_alert\/css\/user-alert.css":1,"sites\/all\/modules\/contrib\/views\/css\/views.css":1,"sites\/all\/modules\/contrib\/ckeditor\/css\/ckeditor.css":1,"sites\/all\/modules\/contrib\/ctools\/css\/ctools.css":1,"sites\/all\/modules\/contrib\/ldap\/ldap_servers\/ldap_servers.admin.css":1,"0":1,"sites\/all\/themes\/nara\/css\/jquery.fancybox.css":1,"sites\/all\/themes\/nara\/css\/do_not_edit.css":1,"sites\/all\/themes\/nara\/css\/bootstrap.min.css":1,"sites\/all\/themes\/nara\/css\/styles.css":1,"sites\/all\/themes\/nara\/css\/vertical-tabs.css":1,"sites\/all\/themes\/nara\/css\/overrides.css":1}},"user_alert":{"url_prefix":"","current_path":"node\/39588"},"bootstrap":{"anchorsFix":1,"anchorsSmoothScrolling":1,"formHasError":1,"popoverEnabled":1,"popoverOptions":{"animation":1,"html":0,"placement":"right","selector":"","trigger":"click","triggerAutoclose":1,"title":"","content":"","delay":0,"container":"body"},"tooltipEnabled":1,"tooltipOptions":{"animation":1,"html":0,"placement":"auto left","selector":"","trigger":"hover focus","delay":0,"container":"body"}}});</script>
+</head>
+<body class="html not-front not-logged-in no-sidebars page-node page-node- page-node-39588 node-type-3-col-page " >
+
+
+<!-- Google Tag Manager (noscript) -->
+
+<noscript><iframe alt="Google Tag Manager" src="https://www.googletagmanager.com/ns.html?id=GTM-WLMC86"
+
+height="0" width="0" style="display:none;visibility:hidden" title="Google Tag Manager"></iframe></noscript>
+
+<!-- End Google Tag Manager (noscript) -->
+  <div class="wrapper section-theme ">
+    <a class="back-to-top" href="#page-header" style="display: none;">Top</a>  
+    <div id="skip-link">
+      <a href="#main-col" class="element-invisible element-focusable">Skip to main content</a>
+    </div>
+      
+
+    <div class="wrapper section-theme">
+  <header id="page-header">
+    
+      <div class="region region-header">
+    <section id="block-block-53" class="block block-block clearfix">
+
+      
+  <div class="col-sm-6" id="logo-wrapper">
+    <div id="logo"><a href="https://www.archives.gov/">The U.S. National Archives Home</a></div>
+    <button id="nav-toggle" class="navbar-toggle" type="button"></button>
+</div>
+<div class="col-sm-6" id="search-wrapper">
+    <div id="top-links">
+        <a class="noBorder" href="https://www.archives.gov/social-media/blogs.html">Blogs</a> &middot;
+        <script type="text/javascript">// <![CDATA[
+        var addthis_pub = "usarchives";
+        var addthis_offset_left = -40;
+        var addthis_brand = "Archives.gov";
+        // ]]></script>
+        <a class="addthisLink" onclick="return addthis_sendto();"
+           onmouseover="return addthis_open(this, '', '[URL]', '[TITLE]');"
+           onmouseout="addthis_close();"
+           onfocus="return addthis_open(this, '', '[URL]', '[TITLE]');"
+           onblur="addthis_close();"
+           href="https://www.addthis.com/bookmark.php?v=250">Bookmark/Share</a> &middot;
+
+        <script type="text/javascript" src="https://s7.addthis.com/js/250/addthis_widget.js"></script>
+
+        <a href="https://www.archives.gov/contact">Contact Us</a>
+
+    </div>
+        <div class="input-group" id="site-search">
+        <form action="https://search.archives.gov/search" method="get" name="search">
+            <input class="form-control" id="qt" accesskey="s" type="text"
+                   name="query" placeholder="Search Archives.gov" title="Search Archives.gov"/>
+            <span class="input-group-btn">
+                <button class="btn btn-default" id="go" type="submit" name="submit">Search</button>
+           </span>
+           <input type="hidden" value="" name="utf8">
+           <input id="affiliate" type="hidden" value="national-archives" name="affiliate">
+        </form>
+    </div>
+
+</div>
+
+</section>
+  </div>
+  </header> <!-- /#page-header -->
+
+
+    <nav id="main-nav" class="clearfix ">
+        <h2 class="element-invisible">Main menu</h2><ul id="main-menu-links" class="links clearfix make-eq"><li class="menu-859 first research"><a href="https://www.archives.gov/research" title="Explore our nation&#039;s history through our documents, photographs, and records." id="research">Research Our Records</a></li>
+<li class="menu-860 veterans"><a href="https://www.archives.gov/veterans" title="Request military records and learn about other services for yourself or a family member." id="veterans" class="veterans">Veterans&#039; Service Records</a></li>
+<li class="menu-861 teachers"><a href="https://www.archives.gov/education" title="Engage students with lesson plans and other classroom materials." id="teachers" class="teachers">Teachers&#039; Resources</a></li>
+<li class="menu-862 locations"><a href="https://www.archives.gov/locations" title="Plan a trip to a facility near you or learn about our national network of locations and services." id="locations" class="locations">Visit Us</a></li>
+<li class="menu-367 last shop"><a href="https://www.archives.gov/founding-docs" title="Order books, gift items, photographic prints, and document reproductions online." id="shop" class="shop">America&#039;s Founding Documents</a></li>
+</ul>    </nav><!-- /main-nav -->
+
+
+<div id="page-body" class="no-sidebar">
+  
+    <header id="title-bar">
+                    <p>Citizen Archivist Dashboard</p>
+                            <div class="breadcrumb">
+                <a href="https://www.archives.gov/">Home</a> &gt; Citizen Archivist            </div><!-- /breadcrumbs -->
+            </header>
+
+
+
+    <div class="row">
+                    <nav  class="col-sm-2">
+
+                <aside id="sidebar-first" >
+                    <nav id="left-menu" class="">
+      
+  <h3>Citizen Archivist Dashboard</h3>
+
+
+<ul>
+<li>
+		<a href="https://www.archives.gov/citizen-archivist/index.html">Main Page</a>
+</li>
+
+	<li>
+		<a href="https://www.archives.gov/citizen-archivist/tag/index.html">Tag</a>
+</li>
+
+	<li>
+		<a href="https://www.archives.gov/citizen-archivist/transcribe/index.html">Transcribe</a>
+</li>
+
+	<li>
+		<a href="https://www.archives.gov/citizen-archivist/edit/index.html">Edit Articles</a>
+</li>
+
+	<li>
+		<a href="https://www.archives.gov/citizen-archivist/upload-and-share/index.html">Upload and Share</a>
+</li>
+
+	<li>
+		<a href="https://www.archives.gov/citizen-archivist/old-weather/index.html">Transcribe Old Weather</a>
+</li>
+
+	<li>
+		<a href="https://www.archives.gov/citizen-archivist/contest/index.html">Enter a Contest</a>
+</li>
+
+	<li>
+		<a href="https://www.archives.gov/citizen-archivist/events/index.html">Events</a>
+</li>
+
+	<li>
+		<a href="https://www.archives.gov/citizen-archivist/have-your-say/index.html">Have Your Say</a>
+</li>
+
+	<li>
+		<a href="https://www.archives.gov/citizen-archivist/suggestion">Make a Suggestion</a>
+</li>
+
+	<li>
+		<a href="https://www.archives.gov/citizen-archivist/activity-by-site">Find Activity by Site</a>
+</li>
+
+</ul>
+<div>
+<!--?php //get_content('/includes/snippets/button-dsh-video.html'); ?-->
+</div>
+  
+</nav>
+                </aside>  <!-- /#sidebar-first -->
+
+        </nav>
+            
+
+                    <div id="main-col" class="col-sm-10">
+              <p id="print-logo">
+<img src="https://www.archives.gov/sites/all/themes/nara/images/nara-print-logo.jpg" alt="National Archives Logo" />
+</p>
+	    <div id="banner">
+        <div id="banner-content">
+            Attention: This web page is for demonstration purposes only, and is not an official publication of the National Archives and Records Administration.<br/><a href="https://github.com/usnationalarchives/demos/blob/master/README.md#whats-this-for">Read more</a>.
+        </div>
+    </div>
+                                                    
+              
+              <div class="region region-content">
+    <section id="block-system-main" class="block block-system clearfix">
+
+      
+  
+
+    
+  <h1>Transcribe | Citizen Archivist</h1>
+    <!--  -->
+
+<div class="spaceBelow">
+	<img alt="You Can Transcribe It!" class="nwidget nimage width100" data-additional-classes="" data-alignment="" data-frame="" data-image_width="100" src="https://www.archives.gov/files/citizen-archivist/transcribe/images/transcribe-banner-1.png" />
+</div>
+<div class="spaceBelow">Help us transcribe some of the millions of digitized pages of records in the  
+	<a href="https://www.archives.gov/research/catalog/">National Archives Catalog</a>. Transcription is an important way for us to improve search results and increase accessibility to our historical records.
+</div>
+
+        
+        
+        <table><tr valign="top"><td rowspan="2"><span id="loggedin"><span id="loggingin"></span><p id="loginmessage">Please log in to begin.</p>
+        <p><input type="text" style="width:134px" id="username" placeholder="username" /><input style="width:134px" type="password" id="password" placeholder="password" onKeydown="Javascript: if (event.keyCode==13) event();" /><br/><input style="width:280px" type="button" id="input" value="Load" /></p></span><span id="tagappear"><span id="test"><textarea rows="40" style="width:300px" id="tagtext" ></textarea><br/><input style="width:100px align:right" type="button" id="tag" value="Submit" /></span></span></td>
+		<td><p><span id="transcribeimage"><span id="loading"></span></span></p></td></tr><tr valign="top"><td><input align="left" type="button" id="next" value="Next page" /><input align="right" type="button" id="skip" value="New document" /></p></td></tr></table>
+		
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+
+
+
+</section>
+  </div>
+
+    </div>
+
+            
+
+
+</div>
+</div>
+    <footer id="page-footer">
+      <div class="clearfix row last-update-wrapper ">
+        <p id="last-update">
+                  <span class="glyphicon glyphicon-edit"></span> This page was last reviewed on September 26, 2016.<br>
+                  <a href="https://www.archives.gov/contact">Contact us with questions or comments</a>.
+        </p>
+      </div>
+        <section id="mega-footer" class="clearfix panel-group">
+      <h2 class="footer-title"> Citizen Archivist</h2>
+  
+<div class="mega-col panel panel-default">
+
+	<div class="panel-heading">
+
+
+		<h2>
+			<a data-parent="#mega-footer" data-target="#type" data-toggle="collapse">Find Activity By Type</a></h2>
+
+
+	</div>
+
+	<div class="panel-collapse" id="type">
+
+
+		<ul>
+			<li>
+				<a href="https://www.archives.gov/citizen-archivist/tag">Tag</a></li>
+
+			<li>
+				<a href="https://www.archives.gov/citizen-archivist/transcribe">Transcribe</a></li>
+
+			<li>
+				<a href="https://www.archives.gov/citizen-archivist/subtitle-videos/">Subtitle Videos</a></li>
+
+			<li>
+				<a href="https://www.archives.gov/citizen-archivist/upload-and-share">Upload and Share</a></li>
+
+			<li>
+				<a href="https://www.archives.gov/citizen-archivist/old-weather/">Transcribe Old Weather</a></li>
+
+			<li>
+				<a href="https://www.archives.gov/citizen-archivist/edit">Edit Articles</a></li>
+
+			<li>
+				<a href="https://www.archives.gov/citizen-archivist/contest">Enter a Contest </a></li>
+
+			<li>
+				<a href="https://www.archives.gov/citizen-archivist/events/index.html">Events</a></li>
+
+			<li>
+				<a href="https://www.archives.gov/citizen-archivist/have-your-say/">Have Your Say</a></li>
+
+			<li>
+				<a href="https://www.archives.gov/citizen-archivist/suggestion">Make a Suggestion</a></li>
+
+			<li>
+				<a href="https://www.archives.gov/careers/volunteering/">Volunteer in Person</a></li>
+
+		</ul>
+	</div>
+
+</div>
+
+<div class="mega-col panel panel-default">
+
+	<div class="panel-heading">
+
+
+		<h2>
+			<a data-parent="#mega-footer" data-target="#site" data-toggle="collapse">Find Activity By Site</a></h2>
+
+
+	</div>
+
+	<div class="panel-collapse" id="site">
+
+
+		<ul>
+			<li>
+				<a href="https://www.archives.gov/citizen-archivist/activity-by-site/#archives">Archives.gov</a></li>
+
+			<li>
+				<a href="https://www.archives.gov/citizen-archivist/activity-by-site/#challenge">Challenge.gov</a></li>
+
+			<li>
+				<a href="https://www.archives.gov/citizen-archivist/activity-by-site/#flickr">Flickr</a></li>
+
+			<li>
+				<a href="https://www.archives.gov/citizen-archivist/activity-by-site/#tumblr">Tumblr</a></li>
+
+			<li>
+				<a href="https://www.archives.gov/citizen-archivist/activity-by-site/#wiki">Wikipedia</a></li>
+
+		</ul>
+	</div>
+
+</div>
+
+<div class="mega-col panel panel-default">
+
+	<div class="panel-heading">
+
+
+		<h2>
+			<a data-parent="#mega-footer" data-target="#resources" data-toggle="collapse">Resources</a></h2>
+
+
+	</div>
+
+	<div class="panel-collapse" id="resources">
+
+
+		<ul>
+			<li>
+				<a href="http://blogs.archives.gov/online-public-access/">NARAtions Blog</a></li>
+
+			<li>
+				<a href="http://blogs.archives.gov/TextMessage/">The Text Message Blog</a></li>
+
+			<li>
+				<a href="http://www.facebook.com/researchatusnationalarchives">Research at the National Archives Facebook Page</a></li>
+
+			<li>
+				<a href="http://twitter.com/usnatarchives" >@USNatArchives on Twitter</a></li>
+
+			<li>
+				<a href="https://www.archives.gov/open">Open Government</a></li>
+
+			<li>
+				<a href="https://www.archives.gov/citizen-archivist/faqs/">Tagging FAQs</a></li>
+
+		</ul>
+	</div>
+
+</div>
+</section>
+
+                    <section id="sub-footer">
+                  <div class="region region-footer-bottom">
+    <section id="block-block-54" class="block block-block clearfix">
+
+      
+  
+
+
+
+
+
+<h2>
+
+
+
+
+
+	<a href="https://www.archives.gov/social-media/">Connect With Us</a></h2>
+
+
+
+
+
+
+
+<ul class="clearfix" id="social-media">
+
+
+
+
+
+	<li class="facebook" data-original-title="Facebook" data-placement="bottom" data-toggle="tooltip" title="">
+
+
+
+
+		<a href="https://www.archives.gov/social-media/facebook">Facebook</a></li>
+
+
+
+
+
+	<li class="twitter" data-original-title="Twitter" data-placement="bottom" data-toggle="tooltip" title="">
+
+
+
+
+		<a href="https://www.archives.gov/social-media/twitter">Twitter</a></li>
+
+
+
+
+
+	<li class="instagram" data-original-title="Instagram" data-placement="bottom" data-toggle="tooltip" title="">
+
+
+
+
+		<a href="https://www.archives.gov/social-media/instagram">Instagram</a></li>
+
+
+
+
+
+	<li class="tumblr" data-original-title="Tumblr" data-placement="bottom" data-toggle="tooltip" title="">
+
+
+
+
+		<a href="https://www.archives.gov/social-media/tumblr">Tumblr</a></li>
+
+
+
+
+
+	<li class="youtube" data-original-title="YouTube" data-placement="bottom" data-toggle="tooltip" title="">
+
+
+
+
+		<a href="https://www.archives.gov/social-media/youtube">YouTube</a></li>
+
+
+
+
+
+	<li class="blogs" data-original-title="Blogs" data-placement="bottom" data-toggle="tooltip" title="">
+
+
+
+
+		<a href="https://www.archives.gov/social-media/blogs">Blogs</a></li>
+
+
+
+
+
+	<li class="flickr" data-original-title="Flickr" data-placement="bottom" data-toggle="tooltip" title="">
+
+
+
+
+		<a href="https://www.archives.gov/social-media/flickr">Flickr</a></li>
+
+
+
+
+
+</ul>
+
+
+
+
+<p>
+
+
+</p>
+
+
+
+
+<p id="footer-links">
+
+
+
+
+
+	<a href="https://www.archives.gov/contact/">Contact Us</a> · 
+ 
+ 
+ 
+ 
+ 
+	<a href="https://www.archives.gov/global-pages/accessibility.html">Accessibility</a> · 
+ 
+ 
+ 
+ 
+ 
+	<a href="https://www.archives.gov/global-pages/privacy.html">Privacy Policy</a> · 
+ 
+ 
+ 
+ 
+ 
+	<a href="https://www.archives.gov/foia/">Freedom of Information Act</a> · 
+ 
+ 
+ 
+ 
+ 
+	<a href="https://www.archives.gov/eeo/policy/complaint-activity.html">No FEAR Act</a> · 
+ 
+ 
+ 
+ 
+ 
+	<a href="http://www.usa.gov/">USA.gov</a></p>
+
+
+
+
+
+
+
+<p id="footer-phone">The U.S. National Archives and Records Administration<br />
+	
+ 
+ 
+ 
+ 
+ 
+
+
+ 
+ 
+ 
+ 
+ 
+	<a href="tel:1-866-272-6272">1-86-NARA-NARA or 1-866-272-6272</a></p>
+
+</section>
+  </div>
+            </section>
+            </footer><!-- /page-footer -->
+</div>
+  <script src="https://www.archives.gov/files/js/js_L50O_PWoAuMOxVjnzZCkNSSmI0kFwhZsO1_KS8WnGKw.js"></script>
+  </div>
+  <a class="back-to-top" href="#page-header" style="display: inline;">Top</a>
+ <script>
+(function ($) {
+  // Original JavaScript code.
+$('.toc').toc({
+'selectors': 'h2,h3',
+'container': '#main-col'
+});
+})(jQuery);
+</script>
+
+</body>
+</html>
