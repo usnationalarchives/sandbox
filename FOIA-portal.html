@@ -1,0 +1,100 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>National Archives catalog statistics</title>
+
+    <meta name="viewport" content="width=device-width">
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+		
+    <script type="text/javascript" language="javascript">
+         $(document).ready(function() {
+            $('#FOIA').keypress(function(enter){
+      			if(enter.keyCode==13)
+      			$('#input').click();
+      			});
+         $("#input").click(function(event){
+         	$('#loading').html('<img width=500 src="https://catalog.archives.gov/images/loader.gif"/>');
+         	var FOIA_tracking_no = $('#FOIA').val();
+               $.getJSON('https://catalog.archives.gov/api/v1?description.fileUnit.variantControlNumberArray.variantControlNumber.type.naId=10675637&description.fileUnit.variantControlNumberArray.variantControlNumber.number="' + FOIA_tracking_no + '"&rows=25&type=description&resultFields=description.fileUnit,objects.object.thumbnail,naId', function(t) {
+					var file_units = t.opaResponse.results.total.toLocaleString("en");
+					var time = t.opaResponse.time;
+					if (file_units < 25) {
+					$('#file_units').html('<ul><ul><h3>File units</h3></ul></ul><ul><ul>There are <u>' + file_units + '</u> <span style="color:#993333">file units</span>.</ul></ul><br/><br/>')
+					}
+					else {
+					$('#file_units').html('<ul><ul><h3>File units</h3></ul></ul><ul><ul>There are <u>' + file_units + '</u> <span style="color:#993333">file units</span>. Displaying the first 25:</ul></ul><br/><br/>');
+					file_units = 25
+					}
+					$('#time').html('<p align="right">This data was generated at ' + time + '.</p>');
+					var results = ''
+					for (n = 0; n < file_units; n++) { 
+						title = t.opaResponse.results.result[n].description.fileUnit.title;
+						naid = t.opaResponse.results.result[n].naId;
+						creator = t.opaResponse.results.result[n].description.fileUnit.parentSeries.creatingOrganizationArray.creatingOrganization.creator.termName;
+						try {
+							thumbnail = t.opaResponse.results.result[n].objects.object.thumbnail['@url'];
+						}
+						catch (err) {
+							thumbnail = t.opaResponse.results.result[n].objects.object[0].thumbnail['@url'];
+						}
+						creator_naid = t.opaResponse.results.result[n].description.fileUnit.parentSeries.creatingOrganizationArray.creatingOrganization.creator.naId;
+						results = results + '<tr><td width="10%" valign="top" align="left"><a href="https://catalog.archives.gov/id/' + naid + '"><img width="75" src="' + thumbnail + '"/></a></td><td width="85%"><a href="https://catalog.archives.gov/id/' + naid + '">"<strong>' + title + '</strong>" (NAID ' + naid + ')</a><br/><ul>Creator: <a href="https://catalog.archives.gov/id/' + creator_naid + '">' + creator + '</a></ul></td></tr>'
+                  	}
+					$('#file_unit_results').html(results);
+               });
+               $.getJSON('https://catalog.archives.gov/api/v1?description.item.variantControlNumberArray.variantControlNumber.type.naId=10675637&description.item.variantControlNumberArray.variantControlNumber.number="' + FOIA_tracking_no + '"&rows=25&type=description&resultFields=description.fileUnit,objects.object.thumbnail,naId', function(t) {
+					var items = t.opaResponse.results.total.toLocaleString("en");
+					var time = t.opaResponse.time;
+					if (items < 25) {
+					$('#items').html('<ul><ul><h3>Items</h3></ul></ul><ul><ul>There are <u>' + items + '</u> <span style="color:#993333">items</span>.</ul></ul><br/><br/>')
+					}
+					else {
+					$('#items').html('<ul><ul><h3>Items</h3></ul></ul><ul><ul>There are <u>' + items + '</u> <span style="color:#993333">items</span>. Displaying the first 25:</ul></ul><br/><br/>');
+					items = 25
+					}
+					$('#time').html('<p align="right">This data was generated at ' + time + '.</p>');
+					var results = ''
+					for (n = 0; n < items; n++) { 
+						title = t.opaResponse.results.result[n].description.item.title;
+						naid = t.opaResponse.results.result[n].naId;
+						creator = t.opaResponse.results.result[n].description.item.parentSeries.creatingOrganizationArray.creatingOrganization.creator.termName;
+						try {
+							thumbnail = t.opaResponse.results.result[n].objects.object.thumbnail['@url'];
+						}
+						catch (err) {
+							thumbnail = t.opaResponse.results.result[n].objects.object[0].thumbnail['@url'];
+						}
+						creator_naid = t.opaResponse.results.result[n].description.item.parentSeries.creatingOrganizationArray.creatingOrganization.creator.naId;
+						results = results + '<tr><td width="10%" valign="top" align="left"><a href="https://catalog.archives.gov/id/' + naid + '"><img width="75" src="' + thumbnail + '"/></a></td><td width="85%"><a href="https://catalog.archives.gov/id/' + naid + '">"<strong>' + title + '</strong>" (NAID ' + naid + ')</a><br/><ul>Creator: <a href="https://catalog.archives.gov/id/' + creator_naid + '">' + creator + '</a></ul></td></tr>'
+                  	}
+                  	$('#item_results').html(results);
+               });
+            });
+            });
+      </script>
+  </head>
+  <body>
+    	<span style="color:black" id="time"></span>
+    	<ul><h2>FOIA search</h2></ul>
+    	<ul><center><input type="text" style="width:280px" id="FOIA" placeholder="FOIA tracking number" /><input style="width:50px" type="button" id="input" value="Search" /></center></ul>
+    	<ul><span id="results"></span>
+    	<span id="file_units"></span>
+    	
+    	<ul><ul><table>
+    	<span id="file_unit_results"></span>
+    	
+    	</table></ul></ul>
+    	
+    	<span id="items"></span>
+    	
+    	<ul><ul><table>
+    	<tr><span id="item_results"><span id="loading"></span></span></tr>
+    	</table></ul></ul>
+
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
