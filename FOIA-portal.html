@@ -14,21 +14,28 @@
       			if(enter.keyCode==13)
       			$('#input').click();
       			});
-         $("#input").click(function(event){
-         	$('#loading').html('<center><img width=500 src="https://catalog.archives.gov/images/loader.gif"/></center>');
-         	var FOIA_tracking_no = $('#FOIA').val();
-               
-            var url = 'https://catalog.archives.gov/api/v1?description.fileUnit.variantControlNumberArray.variantControlNumber.type.naId=10675637&description.fileUnit.variantControlNumberArray.variantControlNumber.number="' + FOIA_tracking_no + '"&rows=25&type=description&resultFields=description.fileUnit,objects.object.thumbnail,naId'
+      		
+            var offset = 0
+            $('#paginate').hide();
+            $('#paginatebottom').hide();
             $('#json').hide();
+            function loadresults(offset, FOIA_tracking_no) {
+            	var start = offset + 1;
+            	var end = offset + 25;
+            	$('#file_unit_results').html('<center><img width=500 src="https://catalog.archives.gov/images/loader.gif"/></center>');
+            	var url = 'https://catalog.archives.gov/api/v1?description.fileUnit.variantControlNumberArray.variantControlNumber.type.naId=10675637&description.fileUnit.variantControlNumberArray.variantControlNumber.number="' + FOIA_tracking_no + '"&rows=25&type=description&resultFields=description.fileUnit,objects.object.thumbnail,naId&offset=' + offset
             $('#json').html('<a href="' + url + '">See in JSON</a>.');
             $.getJSON(url, function(t) {
 					var file_units = t.opaResponse.results.total.toLocaleString("en");
 					var time = t.opaResponse.time;
+					if (end > file_units) { end = file_units };
 					if (file_units < 25) {
-					$('#file_units').html('<ul><ul><h3>File units</h3></ul></ul><ul><ul>There are <u>' + file_units + '</u> <span style="color:#993333">file units</span>.</ul></ul><br/><br/>')
+					$('#file_units').html('<ul><ul><h3>File units</h3></ul></ul><ul><ul>There are <u>' + file_units + '</u> <span style="color:#993333">file units</span>. Displaying results ' + start + ' – ' + file_units + ':</ul></ul></ul></ul><br/><br/>')
 					}
 					else {
-					$('#file_units').html('<ul><ul><h3>File units</h3></ul></ul><ul><ul>There are <u>' + file_units + '</u> <span style="color:#993333">file units</span>. Displaying the first 25:</ul></ul><br/><br/>');
+					$('#file_units').html('<ul><ul>There are <u>' + file_units + '</u> <span style="color:#993333">file units</span>. Displaying results ' + start + ' – ' + end + ':</ul></ul>');
+					$('#paginate').show();
+					$('#paginatebottom').show();
 					file_units = 25
 					}
 					$('#time').html('This data was generated at ' + time + '. ');
@@ -49,46 +56,48 @@
                   	}
 					$('#file_unit_results').html(results);
                });
-//                $.getJSON('https://catalog.archives.gov/api/v1?description.item.variantControlNumberArray.variantControlNumber.type.naId=10675637&description.item.variantControlNumberArray.variantControlNumber.number="' + FOIA_tracking_no + '"&rows=25&type=description&resultFields=description.item,objects.object.thumbnail,naId', function(t) {
-// 					var items = t.opaResponse.results.total.toLocaleString("en");
-// 					var time = t.opaResponse.time;
-// 					if (items < 25) {
-// 					$('#items').html('<ul><ul><h3>Items</h3></ul></ul><ul><ul>There are <u>' + items + '</u> <span style="color:#993333">items</span>.</ul></ul><br/><br/>')
-// 					}
-// 					else {
-// 					$('#items').html('<ul><ul><h3>Items</h3></ul></ul><ul><ul>There are <u>' + items + '</u> <span style="color:#993333">items</span>. Displaying the first 25:</ul></ul><br/><br/>');
-// 					items = 25
-// 					}
-// 					$('#time').html('<p align="right">This data was generated at ' + time + '.</p>');
-// 					var results = ''
-// 					for (n = 0; n < items; n++) { 
-// 						title = t.opaResponse.results.result[n].description.item.title;
-// 						naid = t.opaResponse.results.result[n].naId;
-// 						creator = t.opaResponse.results.result[n].description.item.parentSeries.creatingOrganizationArray.creatingOrganization.creator.termName;
-// 						try {
-// 							thumbnail = t.opaResponse.results.result[n].objects.object.thumbnail['@url'];
-// 						}
-// 						catch (err) {
-// 							thumbnail = t.opaResponse.results.result[n].objects.object[0].thumbnail['@url'];
-// 						}
-// 						creator_naid = t.opaResponse.results.result[n].description.item.parentSeries.creatingOrganizationArray.creatingOrganization.creator.naId;
-// 						results = results + '<ul><ul><table><tr><td width="10%" valign="top" align="left"><a href="https://catalog.archives.gov/id/' + naid + '"><img width="75" src="' + thumbnail + '"/></a></td><td width="75%" valign="top" align="left"><a href="https://catalog.archives.gov/id/' + naid + '">"<strong>' + title + '</strong>" (NAID ' + naid + ')</a><br/><ul>Creator: <a href="https://catalog.archives.gov/id/' + creator_naid + '">' + creator + '</a></ul></td></tr></table></ul></ul>'
-//                   	}
-//                   	$('#item_results').html(results);
-//                });
+            }
+         $("#input").click(function(event){
+         	FOIA_tracking_no = $('#FOIA').val();
+         	loadresults(offset, FOIA_tracking_no);
             });
-            });
+		$("#next").click(function(event){
+			offset = offset + 25;
+			loadresults(offset, FOIA_tracking_no);
+		});
+		$("#prev").click(function(event){
+			if (offset > 24) {
+				offset = offset - 25;
+				loadresults(offset, FOIA_tracking_no);
+			}
+		});
+		$("#nextbot").click(function(event){
+			offset = offset + 25;
+			loadresults(offset, FOIA_tracking_no);
+		});
+		$("#prevbot").click(function(event){
+			if (offset > 24) {
+				offset = offset - 25;
+				loadresults(offset, FOIA_tracking_no);
+			}
+		});
+		$("#jump").click(function(event){
+			var jumpval = $('#jumpval').val();
+			offset = (jumpval - 1) * 25;
+			loadresults(offset, FOIA_tracking_no);
+		});
+		});
       </script>
   </head>
   <body>
-    	
     	<ul><h2>FOIA search</h2></ul>
-    	<ul><center><input type="text" style="width:280px" id="FOIA" placeholder="FOIA tracking number" /><input style="width:50px" type="button" id="input" value="Search" /></center></ul>
+    	<ul><center><input type="search" style="width:280px" id="FOIA" placeholder="FOIA tracking number" /><input style="width:50px" type="button" id="input" value="Search" /></center></ul>
+    	<hr>
     	<p align="right"><span style="color:black" id="time"></span><span style="color:black" id="json"></span></p>
     	<ul><span id="results"></span><span id="results"></span>
-    	<span id="file_units"></span>
-    	<span id="file_unit_results"><span id="loading"></span></span>
-
+    	<span id="file_units"></span><span id="paginate"><p align="center"><input style="width:100px" type="button" id="prev" value="prev"/> &middot; <input style="width:100px" type="button" id="next" value="next"/> &nbsp; &nbsp; | &nbsp; &nbsp; Page: <input type="text" style="width:30px" id="jumpval"/><input style="width:50px" type="button" id="jump" value="Jump" /></p><br/><br/></span>
+    	<span id="file_unit_results"></span>
+    	<span id="paginatebottom"><p align="center"><input style="width:100px" type="button" id="prevbot" value="prev"/> &middot; <input style="width:100px" type="button" id="nextbot" value="next"/></p></span>
     </div>
     
   </body>
