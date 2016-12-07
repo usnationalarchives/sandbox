@@ -23,7 +23,7 @@
             	var start = offset + 1;
             	var end = offset + 25;
             	$('#file_unit_results').html('<center><img width=500 src="https://catalog.archives.gov/images/loader.gif"/></center>');
-            	var url = 'https://catalog.archives.gov/api/v1?description.fileUnit.variantControlNumberArray.variantControlNumber.type.naId=10675637&description.fileUnit.variantControlNumberArray.variantControlNumber.number="' + FOIA_tracking_no + '"&rows=25&type=description&resultFields=description.fileUnit,objects.object.thumbnail,naId&offset=' + offset
+            	var url = 'https://catalog.archives.gov/api/v1?description.fileUnit.variantControlNumberArray.variantControlNumber.type.naId=10675637&description.fileUnit.variantControlNumberArray.variantControlNumber.number=' + FOIA_tracking_no + '&q=' + keyword + '&rows=25&type=description&resultFields=description.fileUnit,objects.object.thumbnail,naId&offset=' + offset
             $('#json').html('<a href="' + url + '">See in JSON</a>.');
             $.getJSON(url, function(t) {
 					var file_units = t.opaResponse.results.total.toLocaleString("en");
@@ -58,8 +58,11 @@
                });
             }
          $("#input").click(function(event){
-         	FOIA_tracking_no = $('#FOIA').val();
-         	loadresults(offset, FOIA_tracking_no);
+         	FOIA_tracking_no = '"' + $('#FOIA').val() + '"';
+         	if (FOIA_tracking_no == '""') { FOIA_tracking_no = '*:*'};
+         	keyword = '"' + $('#keyword').val() + '"';
+         	if (keyword == '""') { keyword = '*:*'};
+         	loadresults(offset, FOIA_tracking_no)
             });
 		$("#next").click(function(event){
 			offset = offset + 25;
@@ -91,7 +94,7 @@
   </head>
   <body>
     	<ul><h2>FOIA search</h2></ul>
-    	<ul><center><input type="search" style="width:280px" id="FOIA" placeholder="FOIA tracking number" /><input style="width:50px" type="button" id="input" value="Search" /></center></ul>
+    	<ul><center><input type="search" style="width:280px" id="keyword" placeholder="keyword (optional)" /> <input type="search" style="width:280px" id="FOIA" placeholder="FOIA tracking number (optional)" /> <input style="width:50px" type="button" id="input" value="Search" /></center></ul>
     	<hr>
     	<p align="right"><span style="color:black" id="time"></span><span style="color:black" id="json"></span></p>
     	<ul><span id="results"></span><span id="results"></span>
