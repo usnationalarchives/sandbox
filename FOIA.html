@@ -99,17 +99,17 @@
 						}
 						}
 						}
-						results = results + '<tr><td width="10%" valign="top" align="left"><a href="https://catalog.archives.gov/id/' + naid + '"><img width="75" src="' + thumbnail + '"/></a></td><td width="85%"><a href="https://catalog.archives.gov/id/' + naid + '">"<strong>' + title + '</strong>" (NAID ' + naid + ')</a><br/><ul>Creator: <a href="https://catalog.archives.gov/id/' + creator_naid + '">' + creator + '</a><br/>Series: &nbsp;"<a href="https://catalog.archives.gov/id/' + series_naid + '">' + series + '</a>" (' + series_dates + ')<br/>FOIA tracking number: <strong>' + tracking_number + '</strong></ul></td></tr>'
+						results = results + '<tr><td class="results" width="10%" valign="top" align="left"><a href="https://catalog.archives.gov/id/' + naid + '"><img width="75" src="' + thumbnail + '"/></a></td><td class="results" width="85%"><a href="https://catalog.archives.gov/id/' + naid + '">"<strong>' + title + '</strong>" (NAID ' + naid + ')</a><br/><ul>Creator: <a href="https://catalog.archives.gov/id/' + creator_naid + '">' + creator + '</a><br/>Series: &nbsp;"<a href="https://catalog.archives.gov/id/' + series_naid + '">' + series + '</a>" (' + series_dates + ')<br/>FOIA tracking number: <strong>' + tracking_number + '</strong></ul></td></tr>'
                   	}
 					$('#file_unit_results').html(results);
                });
             }
          $("#input").click(function(event){
             offset = 0
-         	FOIA_tracking_no = '%22' + $('#FOIA').val() + '%22';
-         	if (FOIA_tracking_no == '%22%22') { FOIA_tracking_no = '*:*'};
-         	keyword = '%22' + $('#keyword').val() + '%22';
-         	if (keyword == '%22%22') { keyword = '*:*'};
+         	FOIA_tracking_no = $('#FOIA').val();
+         	if (FOIA_tracking_no == '') { FOIA_tracking_no = '*:*'};
+         	keyword = $('#keyword').val();
+         	if (keyword == '') { keyword = '*:*'};
          	$('#jumpval').val('');
          	loadresults(offset, FOIA_tracking_no)
             });
@@ -160,17 +160,24 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <link type="text/css" rel="stylesheet" href="https://www.archives.gov/files/css/css_Wu8npAzy16WmnnnWKxpexfgsAryolGGaX6yO3GWA5bU.css" media="all" />
 <style>.section-theme #title-bar{background:#7e2d29 url("https://www.archives.gov/files/global-images/section-headers/about.png") no-repeat center right;}.section-theme #mega-footer > h2{background:#7e2d29}.section-theme #title-bar .breadcrumb{background-color:rgba(207,74,67,0.5);}.section-theme th{background-color:#7e2d29 !important;}.section-theme .btn-primary{background-color:#7e2d29;border-color:#7e2d29;}.section-theme .btn-primary:focus,.section-theme .btn-primary:hover,.section-theme .btn-primary:active,.section-theme .btn-primary:visited{background-color:rgba(207,74,67,0.5);color:#fff;}
 
-     div#banner { 
+	div#banner { 
        top: 0; 
        left: 0; 
        background-color: pink; 
        width: 100%; 
      }
-     div#banner-content { 
+	div#banner-content { 
        margin: 0 auto; 
        padding: 10px; 
        border: 1px solid #000;
      }
+    table {
+  		border-collapse: collapse;
+	}
+	td.results, th.results {
+  		border-bottom:1px dotted #BDB76B;
+  		padding: 10px;
+	}
 </style>
 <link type="text/css" rel="stylesheet" href="https://www.archives.gov/files/css/css_CG2r9xuj7SxBUtRD1vlNk0Fo64mtbQQfaFqEbB-wCDI.css" media="all" />
   <!-- HTML5 element support for IE6-8 -->
@@ -314,11 +321,12 @@ height="0" width="0" style="display:none;visibility:hidden" title="Google Tag Ma
 
       
   
-
-    	<center><input type="search" style="width:280px" id="keyword" placeholder="keyword (optional)" /> <input type="search" style="width:280px" id="FOIA" placeholder="FOIA tracking number (optional)" /> <input style="width:75px" type="button" id="input" value="Search" /></center>
+<p>Use this tool to search for records in the <a href="https://catalog.archives.gov">National Archives catalog</a> with a Freedom of Information Act (FOIA) tracking number.</p><br/>
+    	<center><input type="search" style="width:280px" id="keyword" placeholder="keyword (optional)" /> <input type="search" style="width:280px" id="FOIA" placeholder="FOIA tracking number (optional)" /> <input style="width:75px" type="button" id="input" value="Search" /></center><br/>
+    	<ul><small>Hints: Use quotes when searching for exact-name matches (especially when you have an exact identifier). Both <em>keyword</em> and <em>FOIA tracking number</em> fields are optional; you may also include multiple search terms for each field by using  "or" or "and" between them.</small></ul>
     	<hr>
     	<table width="100%"><tr>
-    	<td><span id="paginate"><p><input style="width:100px" type="button" id="prev" value="prev"/> &middot; <input style="width:100px" type="button" id="next" value="next"/> &nbsp; &nbsp; | &nbsp; &nbsp; Page: <input type="text" style="width:40px" id="jumpval"/> <input style="width:60px" type="button" id="jump" value="Jump" /></p><br/><br/></span></td>
+    	<td valign="middle"><span id="paginate"><p><input style="width:100px" type="button" id="prev" value="prev"/> &middot; <input style="width:100px" type="button" id="next" value="next"/> &nbsp; &nbsp; | &nbsp; &nbsp; Page: <input type="text" style="width:40px" id="jumpval"/> <input style="width:60px" type="button" id="jump" value="Jump" /></p><br/><br/></span></td>
     	<td><p align="right"><span id="time"></span><span id="json"></span></p></td>
     	</tr></table>
     	<ul><span id="results"></span><span id="results"></span>
