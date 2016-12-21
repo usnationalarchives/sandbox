@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <link rel="shortcut icon" href="https://catalog.archives.gov/favicon.ico"/>
-    <title>National Archives catalog statistics</title>
+    <title>National Archives FOIA search</title>
 
     <meta name="viewport" content="width=device-width">
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
@@ -41,7 +41,6 @@
 						count = end - file_units;
 						end = file_units
 						};
-					if (file_units > 0) {
 					if (file_units < 25) {
 					$('#file_units').html('<ul><ul><h3>File units</h3></ul></ul><ul><ul>There are <u>' + file_units + '</u> <span style="color:#993333">file units</span>. Displaying results ' + start + ' – ' + file_units + ':</ul></ul></ul></ul><br/><br/>')
 					}
@@ -72,13 +71,6 @@
 						results = results + '<tr><td width="10%" valign="top" align="left"><a href="https://catalog.archives.gov/id/' + naid + '"><img width="75" src="' + thumbnail + '"/></a></td><td width="85%"><a href="https://catalog.archives.gov/id/' + naid + '">"<strong>' + title + '</strong>" (NAID ' + naid + ')</a><br/><ul>Creator: <a href="https://catalog.archives.gov/id/' + creator_naid + '">' + creator + '</a></ul></td></tr>'
                   	}
 					$('#file_unit_results').html(results);
-					}
-					else {
-					$('#time').html('This data was generated at ' + time + '. ');
-					$('#json').show();
-					$('#file_units').html('There are 0 results for this search.')
-					$('#file_unit_results').html('')
-					}
                });
             }
          $("#input").click(function(event){
