@@ -1159,12 +1159,18 @@ table.sortable-onload-0  tr:nth-of-type(odd) {
     			var title = t.opaResponse.results.result[0].description.recordGroup.title;
     			var startyear = t.opaResponse.results.result[0].description.recordGroup.inclusiveDates.inclusiveStartDate.year;
     			var endyear = t.opaResponse.results.result[0].description.recordGroup.inclusiveDates.inclusiveEndDate.year;
+    			try {
+    				var finding_aid = t.opaResponse.results.result[0].description.recordGroup.findingAidArray.findingAid.note
+    			}
+    			catch(err) {
+    				var finding_aid = '<em>None</em>'
+    			}
     			var reference_unit_array = t.opaResponse.results.result[0].description.recordGroup.referenceUnits.referenceUnit
     			var reference_units = '<br/>Overview of record locations:<br/>'
     			for (n = 0; n < reference_unit_array.length; n++) {
     				var reference_units = reference_units + '&nbsp;&nbsp;&nbsp;&nbsp;&bull; ' + reference_unit_array[n].name + ' (' + reference_unit_array[n].mailCode + ')<br/>'
     				}
-    			$('#front_matter').html('<h1>' + title + '</h1><p><strong><a href="https://catalog.archives.gov/id/' + naid + '">Record Group ' + RG + '</a></strong><br/><em>' + startyear + ' – ' + endyear + '</em><br/>' + reference_units + '</p>' );
+    			$('#front_matter').html('<h1>' + title + '</h1><p><strong><a href="https://catalog.archives.gov/id/' + naid + '">Record Group ' + RG + '</a></strong><br/><em>' + startyear + ' – ' + endyear + '</em><br/>' + reference_units + '</p><h2>Administrative history</h2><p><strong>Finding aid</strong>: ' + finding_aid + '</p>' );
     			$.getJSON('https://catalog.archives.gov/OpaAPI/iapi/v1?action=search&f.level=series&f.parentNaId=' + naid + '&q=*:*&rows=10000', function(f){
     			series_naids = []
     			for (n = 0; n < f.opaResponse.results.result.length; n++) {
