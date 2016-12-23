@@ -1145,10 +1145,13 @@ table.sortable-onload-0  tr:nth-of-type(odd) {
     	$(document).ready(function() {
     		            
 			window.onload = function WindowLoad() {
-			var RG = window.location.search.substring(1).split("=")[1];
-			if (RG !== undefined) {
+			
+			
+			RGorCollectionID = window.location.search.substring(1).split("=");
+			
+			if (RGorCollectionID[1] !== undefined) {
 				$('#hide').hide();
-         		loadresults(RG)
+         		loadresults(RGorCollectionID)
          		}
 			}
 		
@@ -1160,32 +1163,40 @@ table.sortable-onload-0  tr:nth-of-type(odd) {
       			if(enter.keyCode==13)
       			$('#Collinput').click();
       			});
-//             $('#RG_sidebar').keypress(function(enter){
-//       			if(enter.keyCode==13)
-//       			$('#sidebar_input').click();
-//       			});
-    		function loadresults(RG) {
-    		var url = 'https://catalog.archives.gov/api/v1?description.recordGroup.recordGroupNumber=' + RG
-    		RGorCollection = '';
+      			
+    		function loadresults(RGorCollectionID) {
+    		
+    		if (RGorCollectionID[0] == 'RG') {
+    			var url = 'https://catalog.archives.gov/api/v1?description.recordGroup.recordGroupNumber=' + RGorCollectionID[1];
+    			type = 'Record Group'
+    			APItype = 'recordGroup'
+    			}
+    		if (RGorCollectionID[0] == 'collection') {
+    			var url = 'https://catalog.archives.gov/api/v1?description.collection.collectionIdentifier=' + RGorCollectionID[1];
+    			type = 'Collection';
+    			APItype = 'collection'
+    			}
+    			
     		$.getJSON(url, function(t) {
     			var naid = t.opaResponse.results.result[0].naId
-    			var title = t.opaResponse.results.result[0].description.recordGroup.title;
-    			var startyear = t.opaResponse.results.result[0].description.recordGroup.inclusiveDates.inclusiveStartDate.year;
-    			var endyear = t.opaResponse.results.result[0].description.recordGroup.inclusiveDates.inclusiveEndDate.year;
+    			var title = t.opaResponse.results.result[0].description[APItype].title;
+    			var startyear = t.opaResponse.results.result[0].description[APItype].inclusiveDates.inclusiveStartDate.year;
+    			var endyear = t.opaResponse.results.result[0].description[APItype].inclusiveDates.inclusiveEndDate.year;
     			try {
-    				var finding_aid = t.opaResponse.results.result[0].description.recordGroup.findingAidArray.findingAid.note
+    				var finding_aid = t.opaResponse.results.result[0].description[APItype].findingAidArray.findingAid.note
     			}
     			catch(err) {
     				var finding_aid = '<em>None</em>'
     			}
-    			var reference_unit_array = t.opaResponse.results.result[0].description.recordGroup.referenceUnits.referenceUnit
+    			var reference_unit_array = [];
+    			var reference_unit_array = reference_unit_array.concat(t.opaResponse.results.result[0].description[APItype].referenceUnits.referenceUnit)
     			var reference_units = '<br/>Overview of record locations:<br/>'
     			for (n = 0; n < reference_unit_array.length; n++) {
     				var reference_units = reference_units + '&nbsp;&nbsp;&nbsp;&nbsp;&bull; ' + reference_unit_array[n].name + ' (' + reference_unit_array[n].mailCode + ')<br/>'
     				}
-    			$('#front_matter').html('<h1>' + title + '</h1><p><strong><a href="https://catalog.archives.gov/id/' + naid + '">' + RGorCollection + ' ' + RG + '</a></strong><br/><em>' + startyear + ' – ' + endyear + '</em><br/>' + reference_units + '</p><h2>Administrative history</h2><p><strong>Finding aid</strong>: ' + finding_aid + '</p>' );
+    			$('#front_matter').html('<h1>' + title + '</h1><p><strong><a href="https://catalog.archives.gov/id/' + naid + '">' + type + ' ' + RGorCollectionID[1] + '</a></strong><br/><em>' + startyear + ' – ' + endyear + '</em><br/>' + reference_units + '</p><h2>Administrative history</h2><p><strong>Established</strong>: &nbsp;&nbsp; ' + startyear + '</p><p><strong>Abolished</strong>: &nbsp;&nbsp; ' + endyear + '</p><p><strong>Finding aid</strong>: &nbsp;&nbsp; ' + finding_aid + '</p>');
 
-// Currently, we first query the internal API for all the series in an RG/Collection, and then we make an array of all the series' NAIDs to pass as a query to the public API. We have to do this because (1) the public API fields for parentRecordGroup and parentCollection are not searchable, but (2) the internal API doesn't give us all the data we need. So we use the internal API to get the list of NAIDs, and then query them explicitly instead of querying by parent description. In the future, we'll search "https://catalog.archives.gov/api/v1?rows=10000&description.series.parentRecordGroup.recordGroupNumber="
+// Currently, we first query the internal API for all the series in an RG/Collection, and then we make an array of all the series' NAIDs to pass as a query to the public API. We have to do this because (1) the public API fields for parentRecordGroup and parentCollection are not searchable, but (2) the internal API doesn't give us all the data we need. So we use the internal API to get the list of NAIDs, and then query them explicitly instead of querying by parent description. In the future, we'll search "https://catalog.archives.gov/api/v1?rows=10000&description.series.parentRecordGroup[APItype]Number="
 
     			$.getJSON('https://catalog.archives.gov/OpaAPI/iapi/v1?action=search&f.level=series&f.parentNaId=' + naid + '&q=*:*&rows=10000', function(f){
     			series_naids = []
@@ -1203,14 +1214,27 @@ table.sortable-onload-0  tr:nth-of-type(odd) {
     			result_items = [];
     			result_fileunits = [];
     			for (n = 0; n < s.opaResponse.results.result.length; n++) {
+    				
     				try {
-    					creator_naids.push(s.opaResponse.results.result[n].description.series.creatingOrganizationArray.creatingOrganization.creator.naId);
-    					creator_names.push(s.opaResponse.results.result[n].description.series.creatingOrganizationArray.creatingOrganization.creator.termName);
-    				}
-    				catch (err) {
-    					creator_naids.push(s.opaResponse.results.result[n].description.series.creatingOrganizationArray.creatingOrganization[0].creator.naId);
-    					creator_names.push(s.opaResponse.results.result[n].description.series.creatingOrganizationArray.creatingOrganization[0].creator.termName);
-    				}
+						try {
+							creator_naids.push(s.opaResponse.results.result[n].description.series.creatingOrganizationArray.creatingOrganization.creator.naId);
+							creator_names.push(s.opaResponse.results.result[n].description.series.creatingOrganizationArray.creatingOrganization.creator.termName);
+						}
+						catch (err) {
+							creator_naids.push(s.opaResponse.results.result[n].description.series.creatingOrganizationArray.creatingOrganization[0].creator.naId);
+							creator_names.push(s.opaResponse.results.result[n].description.series.creatingOrganizationArray.creatingOrganization[0].creator.termName);
+						}
+					}
+					catch(err) {
+						try {
+							creator_naids.push(s.opaResponse.results.result[n].description.series.creatingIndividualArray.creatingIndividual.creator.naId);
+							creator_names.push(s.opaResponse.results.result[n].description.series.creatingIndividualArray.creatingIndividual.creator.termName);
+						}
+						catch (err) {
+							creator_naids.push(s.opaResponse.results.result[n].description.series.creatingIndividualArray.creatingIndividual[0].creator.naId);
+							creator_names.push(s.opaResponse.results.result[n].description.series.creatingIndividualArray.creatingIndividual[0].creator.termName);
+						}
+					}
     				result_titles.push(s.opaResponse.results.result[n].description.series.title);
     				result_naids.push(s.opaResponse.results.result[n].description.series.naId);
     				result_startyears.push(s.opaResponse.results.result[n].description.series.inclusiveDates.inclusiveStartDate.year);
