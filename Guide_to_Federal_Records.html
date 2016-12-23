@@ -1146,13 +1146,19 @@ table.sortable-onload-0  tr:nth-of-type(odd) {
     		            
 			window.onload = function WindowLoad() {
 			var RG = window.location.search.substring(1).split("=")[1];
-			$('#hide').hide();
-         	loadresults(RG)
+			if (RG !== undefined) {
+				$('#hide').hide();
+         		loadresults(RG)
+         		}
 			}
 		
     		$('#RG').keypress(function(enter){
       			if(enter.keyCode==13)
-      			$('#input').click();
+      			$('#RGinput').click();
+      			});
+      		$('#collection').keypress(function(enter){
+      			if(enter.keyCode==13)
+      			$('#Collinput').click();
       			});
 //             $('#RG_sidebar').keypress(function(enter){
 //       			if(enter.keyCode==13)
@@ -1160,7 +1166,7 @@ table.sortable-onload-0  tr:nth-of-type(odd) {
 //       			});
     		function loadresults(RG) {
     		var url = 'https://catalog.archives.gov/api/v1?description.recordGroup.recordGroupNumber=' + RG
-    		
+    		RGorCollection = '';
     		$.getJSON(url, function(t) {
     			var naid = t.opaResponse.results.result[0].naId
     			var title = t.opaResponse.results.result[0].description.recordGroup.title;
@@ -1177,14 +1183,16 @@ table.sortable-onload-0  tr:nth-of-type(odd) {
     			for (n = 0; n < reference_unit_array.length; n++) {
     				var reference_units = reference_units + '&nbsp;&nbsp;&nbsp;&nbsp;&bull; ' + reference_unit_array[n].name + ' (' + reference_unit_array[n].mailCode + ')<br/>'
     				}
-    			$('#front_matter').html('<h1>' + title + '</h1><p><strong><a href="https://catalog.archives.gov/id/' + naid + '">Record Group ' + RG + '</a></strong><br/><em>' + startyear + ' – ' + endyear + '</em><br/>' + reference_units + '</p><h2>Administrative history</h2><p><strong>Finding aid</strong>: ' + finding_aid + '</p>' );
+    			$('#front_matter').html('<h1>' + title + '</h1><p><strong><a href="https://catalog.archives.gov/id/' + naid + '">' + RGorCollection + ' ' + RG + '</a></strong><br/><em>' + startyear + ' – ' + endyear + '</em><br/>' + reference_units + '</p><h2>Administrative history</h2><p><strong>Finding aid</strong>: ' + finding_aid + '</p>' );
+
+// Currently, we first query the internal API for all the series in an RG/Collection, and then we make an array of all the series' NAIDs to pass as a query to the public API. We have to do this because (1) the public API fields for parentRecordGroup and parentCollection are not searchable, but (2) the internal API doesn't give us all the data we need. So we use the internal API to get the list of NAIDs, and then query them explicitly instead of querying by parent description. In the future, we'll search "https://catalog.archives.gov/api/v1?rows=10000&description.series.parentRecordGroup.recordGroupNumber="
+
     			$.getJSON('https://catalog.archives.gov/OpaAPI/iapi/v1?action=search&f.level=series&f.parentNaId=' + naid + '&q=*:*&rows=10000', function(f){
     			series_naids = []
     			for (n = 0; n < f.opaResponse.results.result.length; n++) {
     				series_naids.push(f.opaResponse.results.result[n].naId);
     			}
-    			series_url = 'https://catalog.archives.gov/api/v1?rows=200&naIds=' + series_naids
-    			$.getJSON(series_url, function(s){
+    			$.getJSON('https://catalog.archives.gov/api/v1?rows=10000', {'naIds': series_naids.slice(0,10).toString() }, function(s){
     			creator_naids = [];
     			creator_names = [];
     			result_titles = [];
@@ -1234,7 +1242,7 @@ table.sortable-onload-0  tr:nth-of-type(odd) {
     		});
     		}
     	
-    	$("#input").click(function(event){
+    	$("#RGinput").click(function(event){
          	RG = $('#RG').val();
          	
          	var url = window.location.pathname,
@@ -1243,17 +1251,20 @@ table.sortable-onload-0  tr:nth-of-type(odd) {
 			newUrl+=newParam;
 			window.location.href = newUrl;
          	
+            });
+
+
+    	$("#Collinput").click(function(event){
+         	collection = $('#collection').val();
+         	
+         	var url = window.location.pathname,
+			newParam="?collection=" + collection;
+			newUrl=url.replace(newParam,"");
+			newUrl+=newParam;
+			window.location.href = newUrl;
          	
             });
-
-
-        $("#sidebar_input").click(function(event){
-         	RG = $('#RG').val();
-         	loadresults(RG)
-            });
-            
          });
-         
          
       </script>
 <span id="front_matter"></span>
@@ -1453,7 +1464,7 @@ table.sortable-onload-0  tr:nth-of-type(odd) {
 
 
 
-<input maxlength="4" type="search" style="width:50px" id="RG" placeholder="RG#" /> <button class="btn btn-primary" style="width:75px" type="button" id="input" value="Search">Search</button>
+<input maxlength="4" type="search" style="width:100px" id="RG" placeholder="RG#" /> <button class="btn btn-primary" style="width:150px" type="button" id="RGinput" value="Search">Find Record Group</button> &nbsp; &nbsp; &nbsp; <input maxlength="14" type="search" style="width:100px" id="collection" placeholder="Collection ID" /> <button class="btn btn-primary" style="width:150px" type="button" id="Collinput" value="Search">Find Collection</button>
 	
 
 
@@ -1468,7 +1479,7 @@ table.sortable-onload-0  tr:nth-of-type(odd) {
 
 
 
-<p><span class="smaller"><em>(Enter numbers only, with no leading zeroes: "25" for RG 25)</em></span> 
+<p><span class="smaller"><em>(For record groups enter numbers only, with no leading zeros: "25" for RG 25; for collection identifiers, supply the exact ID, with any hyphens or spaces: "GB-DRQ")</em></span> 
 </p>
 
 
