@@ -1223,6 +1223,7 @@ table.sortable-onload-0  tr:nth-of-type(odd) {
     			result_extents = [];
     			result_items = [];
     			result_fileunits = [];
+    			result_referenceunits =[]
     			for (n = 0; n < s.opaResponse.results.result.length; n++) {
     				
     				try {
@@ -1249,9 +1250,22 @@ table.sortable-onload-0  tr:nth-of-type(odd) {
     				result_naids.push(s.opaResponse.results.result[n].description.series.naId);
     				result_startyears.push(s.opaResponse.results.result[n].description.series.inclusiveDates.inclusiveStartDate.year);
     				result_endyears.push(s.opaResponse.results.result[n].description.series.inclusiveDates.inclusiveEndDate.year);
+    				try {
     				result_extents.push(s.opaResponse.results.result[n].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence.extent);
+    				result_referenceunits.push(s.opaResponse.results.result[n].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence.referenceUnitArray.referenceUnit.name);
+    				}
+    				catch(err) {
+    					multiextent = '';
+    					multireferenceunit = '';
+    					for (x = 0; x < s.opaResponse.results.result[n].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence.length; x++) {
+    					multiextent = multiextent + '<li>' + s.opaResponse.results.result[n].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence[x].extent + '</li>'
+    					multireferenceunit = multireferenceunit + '<li>' + s.opaResponse.results.result[n].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence[x].referenceUnitArray.referenceUnit.name + '</li>'
+    					}
+    					result_extents.push('<ol>' + multiextent + '</ol>');
+    					result_referenceunits.push('<ol>' + multireferenceunit + '</ol>')
+    				}
     				result_fileunits.push(s.opaResponse.results.result[n].description.series.fileUnitCount);
-    				result_items.push(Number(s.opaResponse.results.result[n].description.series.itemCount) + Number(s.opaResponse.results.result[n].description.series.itemAvCount));
+    				result_items.push(Number(s.opaResponse.results.result[n].description.series.itemCount) + Number(s.opaResponse.results.result[n].description.series.itemAvCount))
     			}
     			var creator_naid_list = creator_naids.filter(function(elem, pos) {
   					return creator_naids.indexOf(elem) == pos;
@@ -1259,22 +1273,33 @@ table.sortable-onload-0  tr:nth-of-type(odd) {
 				var creator_name_list = creator_names.filter(function(elem, pos) {
   					return creator_names.indexOf(elem) == pos;
 				});
-    			sections = ''
+    			sections = []
     			for (i = 0; i < creator_naid_list.length; i++) {
     			rows = ''
 					for (y = 0; y < creator_naids.length; y++) {
 						if (creator_naids[y] == creator_naid_list[i]) {
-						rows = rows + '<tr><td><strong><a href="https://catalog.archives.gov/id/' + result_naids[y] + '">' + result_titles[y] + '</strong></a><br/>&nbsp;&nbsp;&nbsp;&nbsp; (NAID: ' + result_naids[y] + ')</td><td>' + result_startyears[y] + ' – ' + result_endyears[y] + '</td><td>' + result_extents[y] + '</td><td>' + result_fileunits[y] + '</td><td>' + result_items[y] + '</td></tr>'
+						rows = rows + '<tr><td><strong><a href="https://catalog.archives.gov/id/' + result_naids[y] + '">' + result_titles[y] + '</strong></a><br/>&nbsp;&nbsp;&nbsp;&nbsp; (NAID: ' + result_naids[y] + ')</td><td>' + result_startyears[y] + ' – ' + result_endyears[y] + '</td><td>' + result_extents[y] + '</td><td>' + result_referenceunits[y] + '</td><td>' + result_fileunits[y] + '</td><td>' + result_items[y] + '</td></tr>'
 						}
 					}
-    			sections = sections + '<h3><a href="https://catalog.archives.gov/id/' + creator_naid_list[i] + '">' + creator_name_list[i] + '</a></h3><br/><table width="100%" border="1"><tr><th width="40%" rowspan="2"><center>Series (National Archives Identifier)</center></th><th rowspan="2" width="20%"><center>Date range</center></th><th width="30%" rowspan="2"><center>Extent</center></th><th colspan="2"><center>Records</center></th></tr><tr><th width="5%"><center>File units</center></th><th width="5%"><center>Items</center></th></tr>' + rows + '</table>'
-    			}
     			
-    			$('#records').html('<h2>Records</h2>' + sections)
+    			sections.push({title: creator_name_list[i], section: '<h3><a href="https://catalog.archives.gov/id/' + creator_naid_list[i] + '">' + creator_name_list[i] + '</a></h3><br/><table width="100%" border="1"><tr><th width="40%" rowspan="2"><center>Series (National Archives Identifier)</center></th><th rowspan="2" width="12%"><center>Date range</center></th><th width="17%" rowspan="2"><center>Extent</center></th><th width="21%" rowspan="2"><center>Location</center></th><th colspan="2"><center>Records</center></th></tr><tr><th width="5%"><center>File units</center></th><th width="5%"><center>Items</center></th></tr>' + rows + '</table>'})
+    			}
+    	
+				sections.sort(function(a, b){
+					if(a.title < b.title) return -1;
+					if(a.title > b.title) return 1;
+					return 0;
+					});
+				sortedsections =[];
+				for (w = 0; w < sections.length; w++) {
+					sortedsections.push(sections[w].section)
+				};
+    			$('#records').html('<h2>Records</h2>' + sortedsections.join('<br/>'))
     			});
     			});
     		});
     		}
+
     	
     	$("#RGinput").click(function(event){
          	RG = $('#RG').val();
