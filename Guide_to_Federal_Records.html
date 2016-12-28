@@ -1257,9 +1257,9 @@ table.sortable-onload-0  tr:nth-of-type(odd) {
     				catch(err) {
     					multiextent = '';
     					multireferenceunit = '';
-    					for (x = 0; x < s.opaResponse.results.result[n].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence.length; x++) {
-    					multiextent = multiextent + '<li>' + s.opaResponse.results.result[n].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence[x].extent + '</li>'
-    					multireferenceunit = multireferenceunit + '<li>' + s.opaResponse.results.result[n].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence[x].referenceUnitArray.referenceUnit.name + '</li>'
+    					for (l = 0; l < s.opaResponse.results.result[n].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence.length; l++) {
+    					multiextent = multiextent + '<li>' + s.opaResponse.results.result[n].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence[l].extent + '</li>'
+    					multireferenceunit = multireferenceunit + '<li>' + s.opaResponse.results.result[n].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence[l].referenceUnitArray.referenceUnit.name + '</li>'
     					}
     					result_extents.push('<ol>' + multiextent + '</ol>');
     					result_referenceunits.push('<ol>' + multireferenceunit + '</ol>')
