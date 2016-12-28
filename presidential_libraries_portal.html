@@ -281,7 +281,7 @@ table.sortable-onload-0  tr:nth-of-type(odd) {
 			}, 1000);
             function loadresults(location_name, location_id, o) {
                $('#images').html('<img width=300 src="https://catalog.archives.gov/images/loader.gif"/><br/><br/>');
-               url = 'https://catalog.archives.gov/OpaAPI/iapi/v1?action=search&q=*:*&f.locationIds=' + location_id + '&tabType=online&sort=naIdSort%20desc&rows=200&offset=' + o;
+               url = 'https://catalog.archives.gov/OpaAPI/iapi/v1?action=search&q=*:*&f.locationIds=' + location_id + '&tabType=online&sort=naIdSort%20desc&rows=100&offset=' + o;
                $.getJSON(url, function(t) {
 					var images = [];
 					for (i = 0; i < t.opaResponse.results.result.length; i++) {
@@ -295,8 +295,8 @@ table.sortable-onload-0  tr:nth-of-type(odd) {
                }
         
     	$("#loadmore").click(function(event){
-			if ((o + 200) < total) {
-			o = o + 200;
+			if ((o + 100) < total) {
+			o = o + 100;
 			loadresults(location_name, location_id, o)
 			}
 			else {
@@ -304,8 +304,8 @@ table.sortable-onload-0  tr:nth-of-type(odd) {
 			}
 		});
 		$("#loadprev").click(function(event){
-			if (o > 199) {
-			o = o - 200;
+			if (o > 99) {
+			o = o - 100;
 			}
 			else {
 			o = 0;
@@ -313,8 +313,8 @@ table.sortable-onload-0  tr:nth-of-type(odd) {
 			loadresults(location_name, location_id, o)
          });
         $("#loadmore2").click(function(event){
-			if ((o + 200) < total) {
-			o = o + 200;
+			if ((o + 100) < total) {
+			o = o + 100;
 			loadresults(location_name, location_id, o)
 			}
 			else {
@@ -323,7 +323,7 @@ table.sortable-onload-0  tr:nth-of-type(odd) {
 		});
 		$("#loadprev2").click(function(event){
 			if (o > 199) {
-			o = o - 200;
+			o = o - 100;
 			}
 			else {
 			o = 0;
@@ -413,11 +413,11 @@ table.sortable-onload-0  tr:nth-of-type(odd) {
 
     <section id="block-system-main" class="block block-system clearfix">
 
-<button class="btn btn-primary" style="width:100px; display:none" type="button" id="return" align="left">Return</button><p align="center" style="display: none" id="paginate"><button class="btn btn-primary" style="width:150px" type="button" id="loadprev">Prev 200</button> &middot; <button class="btn btn-primary" style="width:150px" type="button" id="loadmore">Next 200</button><br/><span id="resultscomment"></span><br/>
+<button class="btn btn-primary" style="width:100px; display:none" type="button" id="return" align="left">Return</button><p align="center" style="display: none" id="paginate"><button class="btn btn-primary" style="width:150px" type="button" id="loadprev">Prev 100</button> &middot; <button class="btn btn-primary" style="width:150px" type="button" id="loadmore">Next 100</button><br/><span id="resultscomment"></span><br/>
 
 <span id="images"></span>
 
-<br/><button class="btn btn-primary" style="width:150px" type="button" id="loadprev2">Prev 200</button> &middot; <button class="btn btn-primary" style="width:150px" type="button" id="loadmore2">Next 200</button><br/></p>
+<br/><button class="btn btn-primary" style="width:150px" type="button" id="loadprev2">Prev 100</button> &middot; <button class="btn btn-primary" style="width:150px" type="button" id="loadmore2">Next 100</button><br/></p>
 
     <div id="presidents" class="nwidget layout block title-box clearfix space-above" data-title="Visit the Libraries Online" data-version="1" id="shared-libraries-box">
 
