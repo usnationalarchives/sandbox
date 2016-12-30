@@ -1,5 +1,3 @@
-
-
 <!doctype html>
 <html lang="en" dir="ltr" prefix="fb: //www.facebook.com/2008/fbml">
 <head>
@@ -24,122 +22,8 @@
 <meta property="article:modified_time" content="2016-11-09T13:31:24-05:00" />
   <title>Freedom of Information Act (FOIA) Records Search | National Archives</title>
 
-	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-    <script type="text/javascript" language="javascript">
-         $(document).ready(function() {
-            $('#FOIA').keypress(function(enter){
-      			if(enter.keyCode==13)
-      			$('#input').click();
-      			});
-            $('#keyword').keypress(function(enter){
-      			if(enter.keyCode==13)
-      			$('#input').click();
-      			});
-            $('#jumpval').keypress(function(enter){
-      			if(enter.keyCode==13)
-      			$('#jump').click();
-      			});
-      		
-            $('#paginate').hide();
-            $('#paginatebottom').hide();
-            $('#json').hide();
-            function loadresults(offset, FOIA_tracking_no) {
-            	var start = offset + 1;
-            	var end = offset + 25;
-            	$('#file_unit_results').html('<center><img width=500 src="https://catalog.archives.gov/images/loader.gif"/></center>');
-            	var url = 'https://catalog.archives.gov/api/v1?description.fileUnit.variantControlNumberArray.variantControlNumber.type.naId=10675637&description.fileUnit.variantControlNumberArray.variantControlNumber.number=' + FOIA_tracking_no + '&q=' + keyword + '&rows=25&type=description&resultFields=description.fileUnit,objects.object.thumbnail,naId,num&offset=' + offset
-            $('#json').html('<small>See results in: <a href="' + url + '">JSON</a> | <a href="' + url + '&format=xml">XML</a></small><br/><br/>');
-            $.getJSON(url, function(t) {
-					var file_units = t.opaResponse.results.total.toLocaleString("en");
-					var time = new Date(t.opaResponse.time);
-					time = time.toString()
-					count = 25;
-					if (end > file_units) {
-						count = end - file_units;
-						end = file_units
-						};
-					if (file_units < 25) {
-					$('#file_units').html('<ul><ul><h3>File units</h3></ul></ul><ul><ul>There are <u>' + file_units + '</u> <span style="color:#993333">file units</span>. Displaying results ' + start + ' – ' + file_units + ':</ul></ul></ul></ul><br/><br/>')
-					}
-					else {
-					$('#file_units').html('<ul><ul>There are <u>' + file_units + '</u> <span style="color:#993333">file units</span>. Displaying results ' + start + ' – ' + end + ':</ul></ul><br/><br/>');
-					$('#paginate').show();
-					$('#paginatebottom').show();
-					}
-					$('#time').html('<small>This data was generated at<br/>' + time + '<br/> </small>');
-					$('#json').show();
-					var results = ''
-					for (n = 0; n < count; n++) { 
-						title = t.opaResponse.results.result[n].description.fileUnit.title;
-						naid = t.opaResponse.results.result[n].naId;
-						creator = t.opaResponse.results.result[n].description.fileUnit.parentSeries.creatingOrganizationArray.creatingOrganization.creator.termName;
-						try {
-							thumbnail = t.opaResponse.results.result[n].objects.object.thumbnail['@url'];
-						}
-						catch (err) {
-							try {
-							thumbnail = t.opaResponse.results.result[n].objects.object[0].thumbnail['@url'];
-							}
-							catch (err) {
-							thumbnail = 'https://catalog.archives.gov/images/fileunit.svg'
-							}
-						}
-						creator_naid = t.opaResponse.results.result[n].description.fileUnit.parentSeries.creatingOrganizationArray.creatingOrganization.creator.naId;
-						series = t.opaResponse.results.result[n].description.fileUnit.parentSeries.title
-						series_naid = t.opaResponse.results.result[n].description.fileUnit.parentSeries.naId
-						series_dates = t.opaResponse.results.result[n].description.fileUnit.parentSeries.inclusiveDates.inclusiveStartDate.year + ' – ' + t.opaResponse.results.result[n].description.fileUnit.parentSeries.inclusiveDates.inclusiveEndDate.year
-						try {
-						tracking_number = t.opaResponse.results.result[n].description.fileUnit.variantControlNumberArray.variantControlNumber.number
-						}
-						catch (err) {
-						for (y = 0; y < 20; y++) {
-						if (t.opaResponse.results.result[n].description.fileUnit.variantControlNumberArray.variantControlNumber[y].type.naId == 10675637) { 
-						tracking_number = t.opaResponse.results.result[n].description.fileUnit.variantControlNumberArray.variantControlNumber[y].number;
-						y = 20
-						}
-						}
-						}
-						results = results + '<tr><td class="results" width="10%" valign="top" align="left"><a href="https://catalog.archives.gov/id/' + naid + '"><img width="75" src="' + thumbnail + '"/></a></td><td class="results" width="85%"><a href="https://catalog.archives.gov/id/' + naid + '">"<strong>' + title + '</strong>" (NAID ' + naid + ')</a><br/><ul>Creator: <a href="https://catalog.archives.gov/id/' + creator_naid + '">' + creator + '</a><br/>Series: &nbsp;"<a href="https://catalog.archives.gov/id/' + series_naid + '">' + series + '</a>" (' + series_dates + ')<br/>FOIA tracking number: <strong>' + tracking_number + '</strong></ul></td></tr>'
-                  	}
-					$('#file_unit_results').html(results);
-               });
-            }
-         $("#input").click(function(event){
-            offset = 0
-         	FOIA_tracking_no = $('#FOIA').val();
-         	if (FOIA_tracking_no == '') { FOIA_tracking_no = '*:*'};
-         	keyword = $('#keyword').val();
-         	if (keyword == '') { keyword = '*:*'};
-         	$('#jumpval').val('');
-         	loadresults(offset, FOIA_tracking_no)
-            });
-		$("#next").click(function(event){
-			offset = offset + 25;
-			loadresults(offset, FOIA_tracking_no);
-		});
-		$("#prev").click(function(event){
-			if (offset > 24) {
-				offset = offset - 25;
-				loadresults(offset, FOIA_tracking_no);
-			}
-		});
-		$("#nextbot").click(function(event){
-			offset = offset + 25;
-			loadresults(offset, FOIA_tracking_no);
-		});
-		$("#prevbot").click(function(event){
-			if (offset > 24) {
-				offset = offset - 25;
-				loadresults(offset, FOIA_tracking_no);
-			}
-		});
-		$("#jump").click(function(event){
-			var jumpval = $('#jumpval').val();
-			offset = (jumpval - 1) * 25;
-			loadresults(offset, FOIA_tracking_no);
-		});
-		});
-      </script>
+
+
 <!-- Google Tag Manager -->
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -155,10 +39,29 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
 
 
-  <link type="text/css" rel="stylesheet" href="https://www.archives.gov/files/css/css_lQaZfjVpwP_oGNqdtWCSpJT1EMqXdMiU84ekLLxQnc4.css" media="all" />
-<link type="text/css" rel="stylesheet" href="https://www.archives.gov/files/css/css_8wte7oTDhlXydbX8hJ97aPBH8iqGMaF19shlNNgLHyE.css" media="all" />
-<link type="text/css" rel="stylesheet" href="https://www.archives.gov/files/css/css_Wu8npAzy16WmnnnWKxpexfgsAryolGGaX6yO3GWA5bU.css" media="all" />
-<style>.section-theme #title-bar{background:#7e2d29 url("https://www.archives.gov/files/global-images/section-headers/about.png") no-repeat center right;}.section-theme #mega-footer > h2{background:#7e2d29}.section-theme #title-bar .breadcrumb{background-color:rgba(207,74,67,0.5);}.section-theme th{background-color:#7e2d29 !important;}.section-theme .btn-primary{background-color:#7e2d29;border-color:#7e2d29;}.section-theme .btn-primary:focus,.section-theme .btn-primary:hover,.section-theme .btn-primary:active,.section-theme .btn-primary:visited{background-color:rgba(207,74,67,0.5);color:#fff;}
+  <style>
+@import url("https://www.archives.gov/modules/system/system.base.css?oig3vf");
+</style>
+<style>
+@import url("https://www.archives.gov/sites/all/modules/contrib/ldap/ldap_user/ldap_user.css?oig3vf");
+@import url("https://www.archives.gov/sites/all/modules/custom/archives_ui/css/font-awesome.min.css?oig3vf");
+@import url("https://www.archives.gov/sites/all/modules/custom/archives_ui/css/helptext.css?oig3vf");
+@import url("https://www.archives.gov/sites/all/modules/custom/archives_ui/css/ckeditor_custom.css?oig3vf");
+@import url("https://www.archives.gov/sites/all/modules/contrib/calendar/css/calendar_multiday.css?oig3vf");
+@import url("https://www.archives.gov/sites/all/modules/contrib/date/date_api/date.css?oig3vf");
+@import url("https://www.archives.gov/sites/all/modules/contrib/date/date_popup/themes/datepicker.1.7.css?oig3vf");
+@import url("https://www.archives.gov/sites/all/modules/contrib/date/date_repeat_field/date_repeat_field.css?oig3vf");
+@import url("https://www.archives.gov/modules/field/theme/field.css?oig3vf");
+@import url("https://www.archives.gov/modules/node/node.css?oig3vf");
+@import url("https://www.archives.gov/sites/all/modules/contrib/user_alert/css/user-alert.css?oig3vf");
+@import url("https://www.archives.gov/sites/all/modules/contrib/views/css/views.css?oig3vf");
+@import url("https://www.archives.gov/sites/all/modules/contrib/ckeditor/css/ckeditor.css?oig3vf");
+</style>
+<style>
+@import url("https://www.archives.gov/sites/all/modules/contrib/ctools/css/ctools.css?oig3vf");
+@import url("https://www.archives.gov/sites/all/modules/contrib/ldap/ldap_servers/ldap_servers.admin.css?oig3vf");
+</style>
+<style>.section-theme #title-bar{background:#29393b url("https://www.archives.gov/files/global-images/section-headers/research1.png") no-repeat center right;}.section-theme #mega-footer > h2{background:#29393b}.section-theme #title-bar .breadcrumb{background-color:rgba(93,131,138,0.5);}.section-theme th{background-color:#29393b !important;}.section-theme .btn-primary{background-color:#29393b;border-color:#29393b;}.section-theme .btn-primary:focus,.section-theme .btn-primary:hover,.section-theme .btn-primary:active,.section-theme .btn-primary:visited{background-color:rgba(93,131,138,0.5);color:#fff;}
 
 	div#banner { 
        top: 0; 
@@ -171,25 +74,45 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
        padding: 10px; 
        border: 1px solid #000;
      }
-    table {
-  		border-collapse: collapse;
-	}
-	td.results, th.results {
-  		border-bottom:1px dotted #BDB76B;
-  		padding: 10px;
-	}
 </style>
-<link type="text/css" rel="stylesheet" href="https://www.archives.gov/files/css/css_CG2r9xuj7SxBUtRD1vlNk0Fo64mtbQQfaFqEbB-wCDI.css" media="all" />
+<style>
+@import url("https://www.archives.gov/sites/all/themes/nara/css/jquery.fancybox.css?oig3vf");
+@import url("https://www.archives.gov/sites/all/themes/nara/css/bootstrap.min.css?oig3vf");
+@import url("https://www.archives.gov/sites/all/themes/nara/css/styles.css?oig3vf");
+@import url("https://www.archives.gov/sites/all/themes/nara/css/vertical-tabs.css?oig3vf");
+@import url("https://www.archives.gov/sites/all/themes/nara/css/overrides.css?oig3vf");
+</style>
   <!-- HTML5 element support for IE6-8 -->
   <!--[if lt IE 9]>
     <script src="https://archives.gov//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
   <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,300italic,400italic%7CEB+Garamond">
-  <script src="https://www.archives.gov/files/js/js_LcFRnnSHVah-Aw_WQ8aVLXhp3HPJvrOe4h6YEXA5BT8.js"></script>
-<script src="https://www.archives.gov/files/js/js_rkZH-D8eud7vBZwwqTm1kPwJN_CaDwGgNQRMvdz2C24.js"></script>
-<script src="https://www.archives.gov/files/js/js_xnB-GOLN98AkSQeg8eTz5CVdac28LxKvicVfWXSIt5Y.js"></script>
-<script src="https://www.archives.gov/files/js/js_MVryip7iuKF3q2ibd0LSiNm7K01HFn4ieeD6BT-LTBY.js"></script>
-<script>jQuery.extend(Drupal.settings, {"basePath":"\/","pathPrefix":"","ajaxPageState":{"theme":"nara","theme_token":"8i5rtqUkha8Df8VmAZJ741n5oB_VxEasLt5ofZup9w0","js":{"sites\/all\/themes\/bootstrap\/js\/bootstrap.js":1,"sites\/all\/modules\/contrib\/jquery_update\/replace\/jquery\/1.7\/jquery.min.js":1,"misc\/jquery.once.js":1,"misc\/drupal.js":1,"sites\/all\/modules\/custom\/archives_ui\/scripts\/helptext.js":1,"sites\/all\/modules\/contrib\/user_alert\/js\/user-alert.js":1,"sites\/all\/modules\/custom\/nara_custom\/js\/nara_custom.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/affix.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/alert.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/button.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/carousel.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/collapse.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/dropdown.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/modal.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/tooltip.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/popover.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/scrollspy.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/tab.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/transition.js":1,"sites\/all\/themes\/nara\/scripts\/jPanelMenu.js":1,"sites\/all\/themes\/nara\/scripts\/jRespond.js":1,"sites\/all\/themes\/nara\/scripts\/matchHeight.min.js":1,"sites\/all\/themes\/nara\/scripts\/jquery.fancybox.pack.js":1,"sites\/all\/themes\/nara\/scripts\/toc.js":1,"sites\/all\/themes\/nara\/scripts\/scripts.js":1,"sites\/all\/themes\/nara\/scripts\/jquery.scrollTo.js":1},"css":{"modules\/system\/system.base.css":1,"sites\/all\/modules\/contrib\/ldap\/ldap_user\/ldap_user.css":1,"sites\/all\/modules\/custom\/archives_ui\/css\/font-awesome.min.css":1,"sites\/all\/modules\/custom\/archives_ui\/css\/helptext.css":1,"sites\/all\/modules\/custom\/archives_ui\/css\/ckeditor_custom.css":1,"sites\/all\/modules\/contrib\/calendar\/css\/calendar_multiday.css":1,"sites\/all\/modules\/contrib\/date\/date_api\/date.css":1,"sites\/all\/modules\/contrib\/date\/date_popup\/themes\/datepicker.1.7.css":1,"sites\/all\/modules\/contrib\/date\/date_repeat_field\/date_repeat_field.css":1,"modules\/field\/theme\/field.css":1,"modules\/node\/node.css":1,"sites\/all\/modules\/contrib\/user_alert\/css\/user-alert.css":1,"sites\/all\/modules\/contrib\/views\/css\/views.css":1,"sites\/all\/modules\/contrib\/ckeditor\/css\/ckeditor.css":1,"sites\/all\/modules\/contrib\/ctools\/css\/ctools.css":1,"sites\/all\/modules\/contrib\/ldap\/ldap_servers\/ldap_servers.admin.css":1,"0":1,"sites\/all\/themes\/nara\/css\/jquery.fancybox.css":1,"sites\/all\/themes\/nara\/css\/do_not_edit.css":1,"sites\/all\/themes\/nara\/css\/bootstrap.min.css":1,"sites\/all\/themes\/nara\/css\/styles.css":1,"sites\/all\/themes\/nara\/css\/vertical-tabs.css":1,"sites\/all\/themes\/nara\/css\/overrides.css":1}},"user_alert":{"url_prefix":"","current_path":"node\/49678"},"bootstrap":{"anchorsFix":1,"anchorsSmoothScrolling":1,"formHasError":1,"popoverEnabled":1,"popoverOptions":{"animation":1,"html":0,"placement":"right","selector":"","trigger":"click","triggerAutoclose":1,"title":"","content":"","delay":0,"container":"body"},"tooltipEnabled":1,"tooltipOptions":{"animation":1,"html":0,"placement":"auto left","selector":"","trigger":"hover focus","delay":0,"container":"body"}}});</script>
+  <script src="https://www.archives.gov/sites/all/modules/contrib/jquery_update/replace/jquery/1.7/jquery.min.js?v=1.7.2"></script>
+<script src="https://www.archives.gov/misc/jquery.once.js?v=1.2"></script>
+<script src="https://www.archives.gov/misc/drupal.js?oig3vf"></script>
+<script src="https://www.archives.gov/sites/all/modules/custom/archives_ui/scripts/helptext.js?oig3vf"></script>
+<script src="https://www.archives.gov/sites/all/modules/custom/nara_alert/js/user-alert-override.js?oig3vf"></script>
+<script src="https://www.archives.gov/sites/all/modules/custom/nara_custom/js/nara_custom.js?oig3vf"></script>
+<script src="https://www.archives.gov/sites/all/themes/nara/assets/javascripts/bootstrap/affix.js?oig3vf"></script>
+<script src="https://www.archives.gov/sites/all/themes/nara/assets/javascripts/bootstrap/alert.js?oig3vf"></script>
+<script src="https://www.archives.gov/sites/all/themes/nara/assets/javascripts/bootstrap/button.js?oig3vf"></script>
+<script src="https://www.archives.gov/sites/all/themes/nara/assets/javascripts/bootstrap/carousel.js?oig3vf"></script>
+<script src="https://www.archives.gov/sites/all/themes/nara/assets/javascripts/bootstrap/collapse.js?oig3vf"></script>
+<script src="https://www.archives.gov/sites/all/themes/nara/assets/javascripts/bootstrap/dropdown.js?oig3vf"></script>
+<script src="https://www.archives.gov/sites/all/themes/nara/assets/javascripts/bootstrap/modal.js?oig3vf"></script>
+<script src="https://www.archives.gov/sites/all/themes/nara/assets/javascripts/bootstrap/tooltip.js?oig3vf"></script>
+<script src="https://www.archives.gov/sites/all/themes/nara/assets/javascripts/bootstrap/popover.js?oig3vf"></script>
+<script src="https://www.archives.gov/sites/all/themes/nara/assets/javascripts/bootstrap/scrollspy.js?oig3vf"></script>
+<script src="https://www.archives.gov/sites/all/themes/nara/assets/javascripts/bootstrap/tab.js?oig3vf"></script>
+<script src="https://www.archives.gov/sites/all/themes/nara/assets/javascripts/bootstrap/transition.js?oig3vf"></script>
+<script src="https://www.archives.gov/sites/all/themes/nara/scripts/jPanelMenu.js?oig3vf"></script>
+<script src="https://www.archives.gov/sites/all/themes/nara/scripts/jRespond.js?oig3vf"></script>
+<script src="https://www.archives.gov/sites/all/themes/nara/scripts/matchHeight.min.js?oig3vf"></script>
+<script src="https://www.archives.gov/sites/all/themes/nara/scripts/jquery.fancybox.pack.js?oig3vf"></script>
+<script src="https://www.archives.gov/sites/all/themes/nara/scripts/toc.js?oig3vf"></script>
+<script src="https://www.archives.gov/sites/all/themes/nara/scripts/scripts.js?oig3vf"></script>
+<script src="https://www.archives.gov/sites/all/themes/nara/scripts/jquery.scrollTo.js?oig3vf"></script>
+<script>jQuery.extend(Drupal.settings, {"basePath":"\/","pathPrefix":"","ajaxPageState":{"theme":"nara","theme_token":"0ZecJ4pm1CYElVOKuhPE-HBeBAWNe3Q4GscrNseq-Z8","js":{"sites\/all\/themes\/bootstrap\/js\/bootstrap.js":1,"sites\/all\/modules\/contrib\/jquery_update\/replace\/jquery\/1.7\/jquery.min.js":1,"misc\/jquery.once.js":1,"misc\/drupal.js":1,"sites\/all\/modules\/custom\/archives_ui\/scripts\/helptext.js":1,"sites\/all\/modules\/contrib\/user_alert\/js\/user-alert.js":1,"sites\/all\/modules\/custom\/nara_custom\/js\/nara_custom.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/affix.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/alert.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/button.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/carousel.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/collapse.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/dropdown.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/modal.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/tooltip.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/popover.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/scrollspy.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/tab.js":1,"sites\/all\/themes\/nara\/assets\/javascripts\/bootstrap\/transition.js":1,"sites\/all\/themes\/nara\/scripts\/jPanelMenu.js":1,"sites\/all\/themes\/nara\/scripts\/jRespond.js":1,"sites\/all\/themes\/nara\/scripts\/matchHeight.min.js":1,"sites\/all\/themes\/nara\/scripts\/jquery.fancybox.pack.js":1,"sites\/all\/themes\/nara\/scripts\/toc.js":1,"sites\/all\/themes\/nara\/scripts\/scripts.js":1,"sites\/all\/themes\/nara\/scripts\/jquery.scrollTo.js":1},"css":{"modules\/system\/system.base.css":1,"sites\/all\/modules\/contrib\/ldap\/ldap_user\/ldap_user.css":1,"sites\/all\/modules\/custom\/archives_ui\/css\/font-awesome.min.css":1,"sites\/all\/modules\/custom\/archives_ui\/css\/helptext.css":1,"sites\/all\/modules\/custom\/archives_ui\/css\/ckeditor_custom.css":1,"sites\/all\/modules\/contrib\/calendar\/css\/calendar_multiday.css":1,"sites\/all\/modules\/contrib\/date\/date_api\/date.css":1,"sites\/all\/modules\/contrib\/date\/date_popup\/themes\/datepicker.1.7.css":1,"sites\/all\/modules\/contrib\/date\/date_repeat_field\/date_repeat_field.css":1,"modules\/field\/theme\/field.css":1,"modules\/node\/node.css":1,"sites\/all\/modules\/contrib\/user_alert\/css\/user-alert.css":1,"sites\/all\/modules\/contrib\/views\/css\/views.css":1,"sites\/all\/modules\/contrib\/ckeditor\/css\/ckeditor.css":1,"sites\/all\/modules\/contrib\/ctools\/css\/ctools.css":1,"sites\/all\/modules\/contrib\/ldap\/ldap_servers\/ldap_servers.admin.css":1,"0":1,"sites\/all\/themes\/nara\/css\/jquery.fancybox.css":1,"sites\/all\/themes\/nara\/css\/do_not_edit.css":1,"sites\/all\/themes\/nara\/css\/bootstrap.min.css":1,"sites\/all\/themes\/nara\/css\/styles.css":1,"sites\/all\/themes\/nara\/css\/vertical-tabs.css":1,"sites\/all\/themes\/nara\/css\/overrides.css":1}},"user_alert":{"url_prefix":"","current_path":"node\/55899"},"bootstrap":{"anchorsFix":1,"anchorsSmoothScrolling":1,"formHasError":1,"popoverEnabled":1,"popoverOptions":{"animation":1,"html":0,"placement":"right","selector":"","trigger":"click","triggerAutoclose":1,"title":"","content":"","delay":0,"container":"body"},"tooltipEnabled":1,"tooltipOptions":{"animation":1,"html":0,"placement":"auto left","selector":"","trigger":"hover focus","delay":0,"container":"body"}}});</script>
 </head>
 <body class="html not-front not-logged-in no-sidebars page-node page-node- page-node-49678 node-type-3-col-page " >
     <div id="banner">
@@ -318,7 +241,122 @@ height="0" width="0" style="display:none;visibility:hidden" title="Google Tag Ma
               
               <div class="region region-content">
     <section id="block-system-main" class="block block-system clearfix">
-
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+      <script type="text/javascript" language="javascript">
+         $(document).ready(function() {
+            $('#FOIA').keypress(function(enter){
+      			if(enter.keyCode==13)
+      			$('#input').click();
+      			});
+            $('#keyword').keypress(function(enter){
+      			if(enter.keyCode==13)
+      			$('#input').click();
+      			});
+            $('#jumpval').keypress(function(enter){
+      			if(enter.keyCode==13)
+      			$('#jump').click();
+      			});
+      		
+            $('#paginate').hide();
+            $('#paginatebottom').hide();
+            $('#json').hide();
+            function loadresults(offset, FOIA_tracking_no) {
+            	var start = offset + 1;
+            	var end = offset + 25;
+            	$('#file_unit_results').html('<center><img width=500 src="https://catalog.archives.gov/images/loader.gif"/></center>');
+            	var url = 'https://catalog.archives.gov/api/v1?description.fileUnit.variantControlNumberArray.variantControlNumber.type.naId=10675637&description.fileUnit.variantControlNumberArray.variantControlNumber.number=' + FOIA_tracking_no + '&q=' + keyword + '&rows=25&type=description&resultFields=description.fileUnit,objects.object.thumbnail,naId,num&offset=' + offset
+            $('#json').html('<small>See results in: <a href="' + url + '">JSON</a> | <a href="' + url + '&format=xml">XML</a></small><br/><br/>');
+            $.getJSON(url, function(t) {
+					var file_units = t.opaResponse.results.total.toLocaleString("en");
+					var time = new Date(t.opaResponse.time);
+					time = time.toString()
+					count = 25;
+					if (end > file_units) {
+						count = end - file_units;
+						end = file_units
+						};
+					if (file_units < 25) {
+					$('#file_units').html('<ul><ul><h3>File units</h3></ul></ul><ul><ul>There are <u>' + file_units + '</u> <span style="color:#993333">file units</span>. Displaying results ' + start + ' – ' + file_units + ':</ul></ul></ul></ul><br/><br/>')
+					}
+					else {
+					$('#file_units').html('<ul><ul>There are <u>' + file_units + '</u> <span style="color:#993333">file units</span>. Displaying results ' + start + ' – ' + end + ':</ul></ul><br/><br/>');
+					$('#paginate').show();
+					$('#paginatebottom').show();
+					}
+					$('#time').html('<small>This data was generated at<br/>' + time + '<br/> </small>');
+					$('#json').show();
+					var results = ''
+					for (n = 0; n < count; n++) { 
+						title = t.opaResponse.results.result[n].description.fileUnit.title;
+						naid = t.opaResponse.results.result[n].naId;
+						creator = t.opaResponse.results.result[n].description.fileUnit.parentSeries.creatingOrganizationArray.creatingOrganization.creator.termName;
+						try {
+							thumbnail = t.opaResponse.results.result[n].objects.object.thumbnail['@url'];
+						}
+						catch (err) {
+							try {
+							thumbnail = t.opaResponse.results.result[n].objects.object[0].thumbnail['@url'];
+							}
+							catch (err) {
+							thumbnail = 'https://catalog.archives.gov/images/fileunit.svg'
+							}
+						}
+						creator_naid = t.opaResponse.results.result[n].description.fileUnit.parentSeries.creatingOrganizationArray.creatingOrganization.creator.naId;
+						series = t.opaResponse.results.result[n].description.fileUnit.parentSeries.title
+						series_naid = t.opaResponse.results.result[n].description.fileUnit.parentSeries.naId
+						series_dates = t.opaResponse.results.result[n].description.fileUnit.parentSeries.inclusiveDates.inclusiveStartDate.year + ' – ' + t.opaResponse.results.result[n].description.fileUnit.parentSeries.inclusiveDates.inclusiveEndDate.year
+						try {
+						tracking_number = t.opaResponse.results.result[n].description.fileUnit.variantControlNumberArray.variantControlNumber.number
+						}
+						catch (err) {
+						for (y = 0; y < 20; y++) {
+						if (t.opaResponse.results.result[n].description.fileUnit.variantControlNumberArray.variantControlNumber[y].type.naId == 10675637) { 
+						tracking_number = t.opaResponse.results.result[n].description.fileUnit.variantControlNumberArray.variantControlNumber[y].number;
+						y = 20
+						}
+						}
+						}
+						results = results + '<tr><td class="results" width="10%" valign="top" align="left"><a href="https://catalog.archives.gov/id/' + naid + '"><img width="75" src="' + thumbnail + '"/></a></td><td class="results" width="85%"><a href="https://catalog.archives.gov/id/' + naid + '">"<strong>' + title + '</strong>" (NAID ' + naid + ')</a><br/><ul>Creator: <a href="https://catalog.archives.gov/id/' + creator_naid + '">' + creator + '</a><br/>Series: &nbsp;"<a href="https://catalog.archives.gov/id/' + series_naid + '">' + series + '</a>" (' + series_dates + ')<br/>FOIA tracking number: <strong>' + tracking_number + '</strong></ul></td></tr>'
+                  	}
+					$('#file_unit_results').html(results);
+               });
+            }
+         $("#input").click(function(event){
+            offset = 0
+         	FOIA_tracking_no = $('#FOIA').val();
+         	if (FOIA_tracking_no == '') { FOIA_tracking_no = '*:*'};
+         	keyword = $('#keyword').val();
+         	if (keyword == '') { keyword = '*:*'};
+         	$('#jumpval').val('');
+         	loadresults(offset, FOIA_tracking_no)
+            });
+		$("#next").click(function(event){
+			offset = offset + 25;
+			loadresults(offset, FOIA_tracking_no);
+		});
+		$("#prev").click(function(event){
+			if (offset > 24) {
+				offset = offset - 25;
+				loadresults(offset, FOIA_tracking_no);
+			}
+		});
+		$("#nextbot").click(function(event){
+			offset = offset + 25;
+			loadresults(offset, FOIA_tracking_no);
+		});
+		$("#prevbot").click(function(event){
+			if (offset > 24) {
+				offset = offset - 25;
+				loadresults(offset, FOIA_tracking_no);
+			}
+		});
+		$("#jump").click(function(event){
+			var jumpval = $('#jumpval').val();
+			offset = (jumpval - 1) * 25;
+			loadresults(offset, FOIA_tracking_no);
+		});
+		});
+      </script>
       
   
 <p>Use this tool to search for records in the <a href="https://catalog.archives.gov">National Archives catalog</a> with a Freedom of Information Act (FOIA) tracking number.</p><br/>
