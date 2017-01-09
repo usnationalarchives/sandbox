@@ -17,7 +17,7 @@
 			else { keyword = params.q };
 		if (params.offset == undefined) { offset = 0 }
 			else { offset = Number(params.offset) };
-		loadresults(offset, FOIA_tracking_no)
+		loadresults(Number(offset), FOIA_tracking_no)
 				}
 	}
 	
@@ -129,27 +129,38 @@
 		
 	$("#next").click(function(event){
 		offset = offset + 25;
-		loadresults(offset, FOIA_tracking_no);
+		var url = window.location.href;
+		newUrl = url.replace(/offset=[0-9]*(&*)/g,'offset=' + offset + '$1');
+		window.location.href = newUrl
 	});
+	
 	$("#prev").click(function(event){
 		if (offset > 24) {
 			offset = offset - 25;
-			loadresults(offset, FOIA_tracking_no);
+			var url = window.location.href;
+		newUrl = url.replace(/offset=[0-9]*(&*)/g,'offset=' + offset + '$1');
+			window.location.href = newUrl
 		}
 	});
 	$("#nextbot").click(function(event){
 		offset = offset + 25;
-		loadresults(offset, FOIA_tracking_no);
+		var url = window.location.href;
+		newUrl = url.replace(/offset=[0-9]*(&*)/g,'offset=' + offset + '$1');
+		window.location.href = newUrl
 	});
 	$("#prevbot").click(function(event){
 		if (offset > 24) {
 			offset = offset - 25;
-			loadresults(offset, FOIA_tracking_no);
+			var url = window.location.href;
+		newUrl = url.replace(/offset=[0-9]*(&*)/g,'offset=' + offset + '$1');
+			window.location.href = newUrl
 		}
 	});
 	$("#jump").click(function(event){
 		var jumpval = $('#jumpval').val();
 		offset = (jumpval - 1) * 25;
-		loadresults(offset, FOIA_tracking_no);
+		var url = window.location.href;
+		newUrl = url.replace(/offset=[0-9]*(&*)/g,'offset=' + offset + '$1');
+		window.location.href = newUrl
 });
 })
