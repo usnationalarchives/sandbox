@@ -1,4 +1,27 @@
  $(document).ready(function() {
+	
+	
+	window.onload = function WindowLoad() {
+			
+		query = window.location.search.substring(1).split("&");
+		
+		if (query[0] !== '') {
+			params = new String();
+			for (p = 0; p < query.length; p++) {
+				params[query[p].split("=")[0]] = query[p].split("=")[1] 
+			}
+			
+		if (params.FOIA == undefined) { FOIA_tracking_no = '*:*'}
+			else { FOIA_tracking_no = params.FOIA };
+		if (params.q == undefined) { keyword = '*:*'}
+			else { keyword = params.q };
+		if (params.offset == undefined) { offset = 0 }
+			else { offset = Number(params.offset) };
+		loadresults(offset, FOIA_tracking_no)
+				}
+	}
+	
+	
 	$('#FOIA').keypress(function(enter){
 		if(enter.keyCode==13)
 		$('#input').click();
@@ -15,6 +38,8 @@
 	$('#paginate').hide();
 	$('#paginatebottom').hide();
 	$('#json').hide();
+	
+	
 	function loadresults(offset, FOIA_tracking_no) {
 		var start = offset + 1;
 		var end = offset + 25;
@@ -88,14 +113,20 @@
 	   });
 	}
 	 $("#input").click(function(event){
-		offset = 0
+		
+		var url = window.location.pathname;
+		
 		FOIA_tracking_no = $('#FOIA').val();
-		if (FOIA_tracking_no == '') { FOIA_tracking_no = '*:*'};
 		keyword = $('#keyword').val();
-		if (keyword == '') { keyword = '*:*'};
-		$('#jumpval').val('');
-		loadresults(offset, FOIA_tracking_no)
+		if (FOIA_tracking_no !== '') { FOIA_tracking_no = '&FOIA=' + FOIA_tracking_no };
+		if (keyword !== '') { keyword = '&q=' + keyword };
+		newParam = '?offset=0' + FOIA_tracking_no + keyword
+		newUrl=url.replace(newParam,"");
+		newUrl+=newParam;
+		window.location.href = newUrl;
+
 		});
+		
 	$("#next").click(function(event){
 		offset = offset + 25;
 		loadresults(offset, FOIA_tracking_no);
