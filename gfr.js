@@ -3,11 +3,14 @@ $(document).ready(function() {
 	window.onload = function WindowLoad() {
 	
 	
-	RGorCollectionID = window.location.search.substring(1).split("=");
+	params = window.location.search.substring(1).split("=");
 	
-	if (RGorCollectionID[1] !== undefined) {
-		loadresults(RGorCollectionID)
+	if ((params[0] == 'RG') || (params[0] == 'collection')) {
+		loadresults(params)
 		}
+	else if (params[0] == 'keyword') {
+		keyword(params[1])
+	}
 	else {
 		$('#hide').show();
 	}
@@ -21,16 +24,69 @@ $(document).ready(function() {
 		if(enter.keyCode==13)
 		$('#Collinput').click();
 		});
-		
-	function loadresults(RGorCollectionID) {
+	$('#keyword').keypress(function(enter){
+		if(enter.keyCode==13)
+		$('#kyinput').click();
+		});
 	
-	if (RGorCollectionID[0] == 'RG') {
-		var url = 'https://catalog.archives.gov/api/v1?description.recordGroup.recordGroupNumber=' + RGorCollectionID[1];
+	function keyword(keyword) {
+		
+		var url = 'https://catalog.archives.gov/api/v1?rows=10000&resultTypes=recordGroup,collection&q=' + keyword;
+		$.getJSON(url, function(t) {
+ 			if (t.opaResponse.results.total > 0) {
+ 				$('#front_matter').html('<br/>Displaying <strong>' + t.opaResponse.results.total + '</strong> results for this search, sorted automatically by relevance:<br/><br/>');
+ 			}
+			else {
+				$('#front_matter').html('<br/>There are <strong>0</strong> results for this search. Please try again.')
+			}
+			results = '';
+		if (t.opaResponse.results.total > 0) {
+			for (n = 0; n < t.opaResponse.results.result.length; n++) { 
+				
+				naid = t.opaResponse.results.result[n].naId;
+				level = Object.keys(t.opaResponse.results.result[n].description)[0];
+				if (level == 'collection') {
+					id = t.opaResponse.results.result[n].description[level].collectionIdentifier;
+					idtype = 'Collection Identifier';
+					idparam = 'collection'
+					}
+				else {
+					id = t.opaResponse.results.result[n].description[level].recordGroupNumber;
+					idtype = 'Record Group Number';
+					idparam = 'RG'
+				}
+				title = t.opaResponse.results.result[n].description[level].title;
+				try {
+					start_year = t.opaResponse.results.result[n].description[level].inclusiveDates.inclusiveStartDate.year
+				}
+				catch(err) {
+					start_year = '?'
+				}
+				try {
+					end_year = t.opaResponse.results.result[n].description[level].inclusiveDates.inclusiveEndDate.year
+				}
+				catch(err) {
+					end_year = 'present'
+				}
+				year_range = start_year + ' – ' + end_year;
+				series_count = t.opaResponse.results.result[n].description[level].seriesCount;
+				
+				results = results + ' <strong>&mdash;</strong> &nbsp; <a href="' + window.location.pathname + '?' + idparam + '=' + id +'">"<strong>' + title + '</strong>," ' + year_range + '</a><br/> &nbsp; &nbsp; &nbsp; &nbsp; <em>' + idtype + '</em>: <strong>' + id + '</strong>; &nbsp; <em>National Archives Identifier</em>: <a href="https://catalog.archives.gov/id/' + naid + '"><strong>' + naid + '</strong></a><br/> &nbsp; &nbsp; &nbsp; &nbsp; <em>Series count</em>: <strong>' + series_count + '</strong><br/><br/>'
+			}
+			}
+			$('#records').html(results)
+		});
+	}
+	
+	function loadresults(params) {
+	
+	if (params[0] == 'RG') {
+		var url = 'https://catalog.archives.gov/api/v1?description.recordGroup.recordGroupNumber=' + params[1];
 		type = 'Record Group';
 		APItype = 'recordGroup'
 		}
-	if (RGorCollectionID[0] == 'collection') {
-		var url = 'https://catalog.archives.gov/api/v1?description.collection.collectionIdentifier=' + RGorCollectionID[1];
+	if (params[0] == 'collection') {
+		var url = 'https://catalog.archives.gov/api/v1?description.collection.collectionIdentifier=' + params[1];
 		type = 'Collection';
 		APItype = 'collection'
 		}
@@ -168,12 +224,22 @@ $(document).ready(function() {
 	
 		});
 
-
 	$("#Collinput").click(function(event){
 		collection = $('#collection').val();
 	
 		var url = window.location.pathname,
 		newParam="?collection=" + collection;
+		newUrl=url.replace(newParam,"");
+		newUrl+=newParam;
+		window.location.href = newUrl;
+	
+	});
+
+	$("#kyinput").click(function(event){
+		keyword = $('#keyword').val();
+	
+		var url = window.location.pathname,
+		newParam="?keyword=" + keyword;
 		newUrl=url.replace(newParam,"");
 		newUrl+=newParam;
 		window.location.href = newUrl;
