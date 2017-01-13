@@ -34,10 +34,10 @@ $(document).ready(function() {
 		var url = 'https://catalog.archives.gov/api/v1?rows=10000&resultTypes=recordGroup,collection&q=' + keyword;
 		$.getJSON(url, function(t) {
  			if (t.opaResponse.results.total > 0) {
- 				$('#front_matter').html('<br/>Displaying <strong>' + t.opaResponse.results.total + '</strong> results for this search, sorted automatically by relevance:<br/><br/>');
+ 				$('#front_matter').html('<p align="right"><small><a href="' + window.location.pathname + '">Return to search form</a></small></p>Displaying <strong>' + t.opaResponse.results.total + '</strong> results for this search, sorted automatically by relevance:<br/><br/>');
  			}
 			else {
-				$('#front_matter').html('<br/>There are <strong>0</strong> results for this search. Please try again.')
+				$('#front_matter').html('<p align="right"><small><a href="' + window.location.pathname + '">Return to search form</a></small></p>There are <strong>0</strong> results for this search. Please try again.')
 			}
 			results = '';
 		if (t.opaResponse.results.total > 0) {
@@ -115,7 +115,7 @@ $(document).ready(function() {
 		for (n = 0; n < reference_unit_array.length; n++) {
 			var reference_units = reference_units + '<br/>&nbsp;&nbsp;&nbsp;&nbsp;&bull; ' + reference_unit_array[n].name + ' (' + reference_unit_array[n].mailCode + ')'
 			}
-		$('#front_matter').html('<h1>' + title + '</h1><p><strong><a href="https://catalog.archives.gov/id/' + naid + '">' + type + ' ' + id + '</a></strong><br/><em>' + startyear + ' – ' + endyear + '</em><br/><br/><p>This ' + type + ' contains <strong>' + series_count.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '</strong> series.</p>' + reference_units + '</p><h2>Administrative history</h2><p><strong>Established</strong>: &nbsp;&nbsp; ' + startyear + '</p><p><strong>Abolished</strong>: &nbsp;&nbsp; ' + endyear + '</p><p><strong>Finding aid</strong>: &nbsp;&nbsp; ' + finding_aid + '</p>');
+		$('#front_matter').html('<p align="right"><small><a href="' + window.location.pathname + '">Return to search form</a></small></p><h1>' + title + '</h1><p><strong><a href="https://catalog.archives.gov/id/' + naid + '">' + type + ' ' + id + '</a></strong><br/><em>' + startyear + ' – ' + endyear + '</em><br/><br/><p>This ' + type + ' contains <strong>' + series_count.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '</strong> series.</p>' + reference_units + '</p><h2>Administrative history</h2><p><strong>Established</strong>: &nbsp;&nbsp; ' + startyear + '</p><p><strong>Abolished</strong>: &nbsp;&nbsp; ' + endyear + '</p><p><strong>Finding aid</strong>: &nbsp;&nbsp; ' + finding_aid + '</p>');
 
 // Currently, we first query the internal API for all the series in an RG/Collection, and then we make an array of all the series' NAIDs to pass as a query to the public API. We have to do this because (1) the public API fields for parentRecordGroup and parentCollection are not searchable, but (2) the internal API doesn't give us all the data we need. So we use the internal API to get the list of NAIDs, and then query them explicitly instead of querying by parent description. In the future, we'll search "https://catalog.archives.gov/api/v1?rows=10000&description.series.parentRecordGroup.recordGroupNumber="
 
