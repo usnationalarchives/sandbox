@@ -170,11 +170,15 @@ $(document).ready(function() {
 				multiextent = '';
 				multireferenceunit = '';
 				for (l = 0; l < s.opaResponse.results.result[n].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence.length; l++) {
-				multiextent = multiextent + '<li>' + s.opaResponse.results.result[n].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence[l].extent + '</li>'
-				multireferenceunit = multireferenceunit + '<li>' + s.opaResponse.results.result[n].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence[l].referenceUnitArray.referenceUnit.name + '</li>'
+				if ((l == 0) || ((l > 0) && (s.opaResponse.results.result[n].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence[l].extent !== s.opaResponse.results.result[n].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence[l - 1].extent))) {
+					multiextent = multiextent + s.opaResponse.results.result[n].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence[l].extent + '<br/>'
+					}
+				if ((l == 0) || ((l > 0) && (s.opaResponse.results.result[n].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence[l].referenceUnitArray.referenceUnit.name !== s.opaResponse.results.result[n].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence[l - 1].referenceUnitArray.referenceUnit.name))) {
+					multireferenceunit = multireferenceunit + s.opaResponse.results.result[n].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence[l].referenceUnitArray.referenceUnit.name + '<br/>'
 				}
-				result_extents.push('<ol>' + multiextent + '</ol>');
-				result_referenceunits.push('<ol>' + multireferenceunit + '</ol>')
+				}
+				result_extents.push(multiextent);
+				result_referenceunits.push(multireferenceunit)
 			}
 			result_fileunits.push(s.opaResponse.results.result[n].description.series.fileUnitCount);
 			result_items.push(Number(s.opaResponse.results.result[n].description.series.itemCount) + Number(s.opaResponse.results.result[n].description.series.itemAvCount))
