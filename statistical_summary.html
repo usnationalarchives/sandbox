@@ -1168,9 +1168,7 @@ table.sortable-onload-0  tr:nth-of-type(odd) {
     		f = t.opaResponse.results.result;
     		
     		f.sort(function(a, b){
-				if(a.description.recordGroup.recordGroupNumber < b.description.recordGroup.recordGroupNumber) return -1;
-				if(a.description.recordGroup.recordGroupNumber > b.description.recordGroup.recordGroupNumber) return 1;
-				return 0;
+				return a.description.recordGroup.recordGroupNumber - b.description.recordGroup.recordGroupNumber;
 			})
     		
     		for ( i = 0 ; i < f.length ; i++) {
