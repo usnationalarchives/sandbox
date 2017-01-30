@@ -124,7 +124,7 @@ $(document).ready(function() {
 		for (n = 0; n < f.opaResponse.results.result.length; n++) {
 			series_naids.push(f.opaResponse.results.result[n].naId);
 		}
-		$.getJSON('https://catalog.archives.gov/api/v1?rows=10000', {'naIds': series_naids.slice(0,750).toString() }, function(s){
+		$.getJSON('https://catalog.archives.gov/api/v1?sort=titleSort asc&rows=10000', {'naIds': series_naids.slice(0,750).toString() }, function(s){
 		
 		creator_naids = [];
 		creator_names = [];
@@ -163,8 +163,8 @@ $(document).ready(function() {
 			result_startyears.push(s.opaResponse.results.result[n].description.series.inclusiveDates.inclusiveStartDate.year);
 			result_endyears.push(s.opaResponse.results.result[n].description.series.inclusiveDates.inclusiveEndDate.year);
 			try {
-			result_extents.push(s.opaResponse.results.result[n].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence.extent);
-			result_referenceunits.push(s.opaResponse.results.result[n].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence.referenceUnitArray.referenceUnit.name);
+				result_extents.push(s.opaResponse.results.result[n].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence.extent);
+				result_referenceunits.push(s.opaResponse.results.result[n].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence.referenceUnitArray.referenceUnit.name);
 			}
 			catch(err) {
 				multiextent = '';
