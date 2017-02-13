@@ -34,7 +34,7 @@ jQuery(document).ready(function($){
 			else {
 				$('#more').hide();
 				$('#images').html('<p>There are currently <strong>' + total + '</strong> records with citizen-contributed images. This is the end of the results set. Showing final ' + t.opaResponse.results.result.length + ':</p><br/>' + images)
-				$('#imageswidget').html('<p>There are currently <strong>' + total + '</strong> records with citizen-contributed images from the Innovation Hub. Showing 10:</p><br/>' + images);
+				$('#imageswidget').html('<p>There are currently <strong>' + total + '</strong> records with citizen-contributed images from the Innovation Hub. Here are the last 20:</p><br/>' + images);
 				
 			}
 			});
