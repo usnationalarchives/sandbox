@@ -24,7 +24,7 @@ jQuery(document).ready(function($){
 								}
 							if (t.opaResponse.results.result[i].briefResults.metadataArea[d].name == 'naId') { naid = t.opaResponse.results.result[i].briefResults.metadataArea[d].value }
 						}
-						images = images + '<a href="https://catalog.archives.gov/id/' + t.opaResponse.results.result[i].naId + '"><img data-html="true" title="Title:&#013;&#34;' + t.opaResponse.results.result[i].briefResults.titleLine[0].value + '&#34;&#013;&#013;Creator:&#013;' + creators + '&#013;&#013;National Archives Identifier: ' + naid + '" src="https://catalog.archives.gov/OpaAPI/media/' + t.opaResponse.results.result[i].naId + '/' + t.opaResponse.results.result[i].thumbnailFile + '" height="50" width="50" /></a>';
+						images = images + '<a href="https://catalog.archives.gov/id/' + t.opaResponse.results.result[i].naId + '"><img data-html="true" title="Title:&#013;&#34;' + t.opaResponse.results.result[i].briefResults.titleLine[0].value + '&#34;&#013;&#013;Creator:&#013;' + creators + '&#013;&#013;National Archives Identifier: ' + naid + '" src="https://catalog.archives.gov/OpaAPI/media/' + t.opaResponse.results.result[i].naId + '/' + t.opaResponse.results.result[i].thumbnailFile + '" style="width:50px;" /></a>';
 						}
 					total = t.opaResponse.results['@total']
 			if ((t.opaResponse.results.result.length == 500) && ((total - o) !== 500)) {
