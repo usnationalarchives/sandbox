@@ -1,6 +1,8 @@
 jQuery(document).ready(function($){
 	$( function() {
-    	$( document ).tooltip();
+    	$("#imageswidget").tooltip();
+    	$("#images").tooltip();
+    	
 	} );
 	$(document).ready(function() {
 		$("#input").ready(function(event){
