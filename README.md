@@ -14,7 +14,13 @@ However, this is primarily an internal workspace at this time, and not intended 
 
 | Demo          | Description   | Status |
 | ------------- | ------------- | ------ |
-| [Freedom of Information Act (FOIA) Records Search](https://usnationalarchives.github.io/demos/FOIA.html) | A portal to search digitized records from the National Archives Catalog that were made available responsive to FOIA requests. | In progress |
+|
+[Freedom of Information Act (FOIA) Records Search](https://usnationalarchives.github.io/demos/FOIA.html) | A portal to search digitized records from the National Archives Catalog that were made available responsive to FOIA requests.
+|
+```diff
++ In progress
+```
+|
 | [Guide to Federal Records](https://usnationalarchives.github.io/demos/Guide_to_Federal_Records.html) | A version of the Guide to Federal Records that provides the most updated information from the National Archives Catalog. The demo includes a [statistical summary](https://usnationalarchives.github.io/demos/statistical_summary.html) of the holdings described in the National Archives Catalog. | In progress |
 | [Transcribe](https://usnationalarchives.github.io/demos/transcription_mission.html) | Discover and transcribe untranscribed documents from the National Archives Catalog. | In progress |
 | [Digitized Records from Presidential Libraries](https://usnationalarchives.github.io/demos/presidential_libraries_portal.html) | View digitized materials from each of the Presidential Libraries. | In progress |
