@@ -231,7 +231,7 @@ $(document).ready(function() {
 	$("#Collinput").click(function(event){
 		collection = $('#collection').val();
 	
-		var url = window.location.pathname,
+		var url = window.location.pathname;
 		newParam="?collection=" + collection;
 		newUrl=url.replace(newParam,"");
 		newUrl+=newParam;
@@ -242,7 +242,7 @@ $(document).ready(function() {
 	$("#kyinput").click(function(event){
 		keyword = $('#keyword').val();
 	
-		var url = window.location.pathname,
+		var url = window.location.pathname;
 		newParam="?keyword=" + keyword;
 		newUrl=url.replace(newParam,"");
 		newUrl+=newParam;
