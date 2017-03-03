@@ -5,7 +5,26 @@ jQuery(document).ready(function($){
     	
 	} );
 	$(document).ready(function() {
+	
 		$("#input").ready(function(event){
+	
+	window.onload = function WindowLoad() {
+	
+	params = window.location.search.substring(1).split("=");
+	
+	o = 0;
+	pg = 1;
+	
+	if (params[0] == 'pg') {
+		pg = params[1];
+		o = (+pg * 500) - 500;
+		$(window).scrollTop(0);
+		generate(o)
+		}
+	else {
+		generate(o)
+	}
+	}
 			function generate(o) {
 				$("#images").html('<center><img width=500 src="https://catalog.archives.gov/images/loader.gif"/></center>');
 				var images = '';
@@ -41,13 +60,14 @@ jQuery(document).ready(function($){
 			}
 			});
 		}
-			o = 0;
-			generate(o)
 		
 		$("#more").click(function(event){
-			$(window).scrollTop(0);
-			o = o + 500;
-			generate(o)
+			pg = +pg + 1;
+			var url = window.location.pathname;
+			newParam="?pg=" + pg;
+			newUrl=url.replace(newParam,"");
+			newUrl+=newParam;
+			window.location.href = newUrl;
 		});
 		
 		});
