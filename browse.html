@@ -1,0 +1,134 @@
+<!--
+- archives.gov style
+- separate JS
+- Paging
+- Handle RG/series with 0 results
+- Collections
+- Link to records for final items
+- Add'l metadata?
+- Better navigation links
+- If a file unit has no image, check if it has children?
+-->
+
+<html>
+<head>
+<style>
+.button {
+	-moz-box-shadow: 0px 0px 0px 2px #9fb4f2;
+	-webkit-box-shadow: 0px 0px 0px 2px #9fb4f2;
+	box-shadow: 0px 0px 0px 2px #9fb4f2;
+	background-color:#7892c2;
+	-moz-border-radius:10px;
+	-webkit-border-radius:10px;
+	border-radius:10px;
+	border:1px solid #4e6096;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:16;
+	padding:12px 37px;
+	text-decoration:none;
+	text-shadow:0px 1px 0px #283966;
+}
+.button:hover {
+	background-color:#666666;
+}
+.button:active {
+	position:relative;
+	top:1px;
+}
+</style>
+</head>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script type="text/javascript" language="javascript">
+var listseries
+var listfileitem
+var listitem
+$(document).ready(function() {
+ 
+function listrg() {
+url = 'https://catalog.archives.gov/api/v1?resultTypes=recordGroup&rows=10000'
+$.getJSON(url, function(t) {
+
+titles = []
+
+for (f = 0; f < t.opaResponse.results.total; f++) {
+	naid = t.opaResponse.results.result[f].naId
+	RG = t.opaResponse.results.result[f].description.recordGroup.recordGroupNumber
+	titles.push({title: '<button class="button" href="#" onclick="listseries(\'' + naid + '\', \'' + RG + '\', \'' + t.opaResponse.results.result[f].description.recordGroup.title + '\');">+ ' + 'Record Group ' + RG + ': ' + t.opaResponse.results.result[f].description.recordGroup.title + '</button><br/>', RG: RG})
+	}
+	
+	titles.sort(function(a, b){
+		return a.RG - b.RG;
+	});
+	
+	sortedtitles = [];
+	for (w = 0; w < titles.length; w++) {
+		sortedtitles.push(titles[w].title)
+	};
+	
+$('#listrg').html('<h2>Now viewing: All Record Groups</h2><h3>' + t.opaResponse.results.total + ' record groups:</h3>' + sortedtitles.join('<br/>'));
+
+});
+
+}
+
+listseries = function(RGnaid, RG, RGtitle) {
+url = 'https://catalog.archives.gov/OpaAPI/iapi/v1?action=search&f.parentNaId=' + RGnaid + '&q=*:*&rows=10000&sort=title desc'
+$.getJSON(url, function(t) {
+
+titles = ''
+
+for (f = 0; f < t.opaResponse.results['@total']; f++) {
+	naid = t.opaResponse.results.result[f].naId
+	name = t.opaResponse.results.result[f].briefResults.titleLine[0].value.replace(/\"/g, '&#x22;')
+	date = t.opaResponse.results.result[f].briefResults.titleLine[1].value
+	
+	titles = titles + '<button class="button" href="#" onclick="listfileitem(\'' + naid + '\', \'' + name + '\', \'' + date + '\');">+ ' + name + ' (' + date + ')</button><br/><br/>'
+	}
+	
+$('#listrg').html('<h2>Now viewing: Record Group ' + RG + ': <a href=\"http://catalog.archives.gov/id/' + RGnaid + '\">' + RGtitle + '</a></h2><h3>' + t.opaResponse.results['@total'] + ' series:</h3>' + titles);
+
+});
+
+}
+
+listfileitem = function(seriesnaid, seriesname, seriesdate) {
+url = 'https://catalog.archives.gov/OpaAPI/iapi/v1?action=search&f.parentNaId=' + seriesnaid + '&q=*:*&rows=10000&sort=title desc'
+$.getJSON(url, function(t) {
+
+titles = ''
+try {
+for (f = 0; f < t.opaResponse.results['@total']; f++) {
+	naid = t.opaResponse.results.result[f].naId
+	name = t.opaResponse.results.result[f].briefResults.titleLine[0].value.replace(/\"/g, '&#x22;')
+	if (t.opaResponse.results.result[f].thumbnailFile !== '') {
+		thumbnail = 'https://catalog.archives.gov/OpaAPI/media/' + naid + '/' + t.opaResponse.results.result[f].thumbnailFile
+	}
+	else {
+		thumbnail = ''
+		}
+	titles = titles + '<tr><td style="border-right:solid 2px; text-align:right"><img src="' + thumbnail + '"/></td><td style="border-bottom:solid 1px" valign="top"><button class="button" href="#" onclick="listitem(\'' + naid + '\', \'' + name + '\', \'' + date + '\');">+ \"' + name + '\"</button></tr>'
+	}
+	
+$('#listrg').html('<h2>Now viewing: Series "<a href=\"http://catalog.archives.gov/id/' + seriesnaid + '\">' + seriesname + '</a>" (' + seriesdate + ')</h2><h3>' + t.opaResponse.results['@total'] + ' records:</h3><table>' + titles + '</table>');
+
+}
+catch(err) {
+$('#listrg').html()
+}
+});
+
+}
+
+
+listrg()
+
+})
+</script>
+
+<span id="listrg"/>
+
+</body>
+</html>

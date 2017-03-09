@@ -206,7 +206,7 @@ $(document).ready(function() {
 			if(a.title > b.title) return 1;
 			return 0;
 			});
-		sortedsections =[];
+		sortedsections = [];
 		for (w = 0; w < sections.length; w++) {
 			sortedsections.push(sections[w].section)
 		};
