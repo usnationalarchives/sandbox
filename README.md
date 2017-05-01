@@ -8,7 +8,7 @@ This code is for demonstration purposes, and may not be working, maintained, or 
 
 If you see anything cool or useful being worked on, feel free to give us feedback in the [issue tracker](https://github.com/usnationalarchives/sandbox/issues)! We are happy to hear from potential audiences or users of our tools. We especially appreciate opinions on the projects that are marked below as seeking feedback—these are demos that may be ready to go live on our web site soon. 
 
-For users without GitHub accounts, feedback can be emailed to developer@nara.gov.
+For users without GitHub accounts, feedback can be emailed to developer@nara.gov or posted on the ICN (NARA staff only).
 
 ## List of demos
 
