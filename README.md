@@ -14,13 +14,12 @@ However, this is primarily an internal workspace at this time, and not intended 
 
 | Demo          | Description   | Status |
 | ------------- | ------------- | ------ |
-|
-[Freedom of Information Act (FOIA) Records Search](https://usnationalarchives.github.io/sandbox/FOIA.html) | A portal to search digitized records from the National Archives Catalog that were made available responsive to FOIA requests. | __&#x1F4CB; — Seeking feedback__ |
+| [Recently Scanned (Innovation Hub)](https://www.archives.gov/innovation-hub/recentlyscanned) | Visualize records scanned by Innovation Hub volunteers. | :white_check_mark: — __Live, seeking feedback__ |
+||||
+| [Freedom of Information Act (FOIA) Records Search](https://usnationalarchives.github.io/sandbox/FOIA.html) | A portal to search digitized records from the National Archives Catalog that were made available responsive to FOIA requests. | __&#x1F4CB; — Seeking feedback__ |
 ||||
 | [Guide to Federal Records](https://usnationalarchives.github.io/sandbox/Guide_to_Federal_Records.html) | A version of the Guide to Federal Records that provides the most updated information from the National Archives Catalog. The demo includes a [statistical summary](https://usnationalarchives.github.io/demos/statistical_summary.html) of the holdings described in the National Archives Catalog. | __&#x1F4CB; — Seeking feedback__ |
 ||||
-| [Transcribe](https://usnationalarchives.github.io/sandbox/transcription_mission.html) | Discover and transcribe untranscribed documents from the National Archives Catalog. | &#x1F6A7; — In progress |
-||||
 | [Digitized Records from Presidential Libraries](https://usnationalarchives.github.io/sandbox/presidential_libraries_portal.html) | View digitized materials from each of the Presidential Libraries. | __&#x1F4CB; — Seeking feedback__ |
 ||||
-| [Recently Scanned (Innovation Hub)](https://usnationalarchives.github.io/sandbox/recently-scanned.html) | Visualize records scanned by Innovation Hub volunteers. | __&#x1F4CB; — Seeking feedback__ |
+| [Transcribe](https://usnationalarchives.github.io/sandbox/transcription_mission.html) | Discover and transcribe untranscribed documents from the National Archives Catalog. | &#x1F6A7; — __In progress__ |
