@@ -29,7 +29,7 @@
 	
 	function loadresults(keyword) {
 		$('#results').html('<center><img width=500 src="https://catalog.archives.gov/images/loader.gif"/></center>');
-		var url = 'https://api.trello.com/1/search/?key=d5df2cb0e527951048088bc1409ba72d&token=bf2cd26947cbde818dd85b35da726a1df3d5faec16412bfd8792360e18886de1&idBoards=588f598a84f5411c9d4eaacb&cards_limit=1000&card_board=true&card_list=true&query=' + keyword
+		var url = 'https://api.trello.com/1/search/?key=51e4635ad64d4c277ef993f9106d7b9d&token=911174763aa15051aff3a3619d1c4364be8bda8d25e6286a6747f5694275f6c5&idBoards=588f598a84f5411c9d4eaacb&cards_limit=1000&card_board=true&card_list=true&query=' + keyword
 		
 	$('#json').html('<small>See results in: <a href="' + url + '">JSON</a></small><br/>');
 	$.getJSON(url, function(t) {
