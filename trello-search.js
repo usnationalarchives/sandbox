@@ -37,7 +37,7 @@
 		for (n = 0; n < t.cards.length; n++) { 
 			var name = t.cards[n].name;
 			var url = t.cards[n].url;
-			var description = t.cards[n].desc
+			var description = t.cards[n].desc.replace(/\n\n/g, '<br/>')
 			var label = t.cards[n].labels[0].name
 			var label_color = t.cards[n].labels[0].color
 			var last_activity = new Date(t.cards[n].dateLastActivity)
@@ -61,8 +61,10 @@
 			description = description.replace(urlRegex, function(url) {
 			return '<a href="' + url + '">' + url + '</a>';
 			});
-			
-			results = results + '<div style="-webkit-border-radius: 20px;-moz-border-radius: 20px;border:1px solid #000000;border-radius: 20px;background-color:lightblue;"><br/><p style="margin-left:1em; font-size: 125%"><a href="' + url + '">' + name + '</a></p><div style="background-color:' + list_color + ';"><hr><p style="margin-left:1em;"><strong><u>Status</u>: ' + list + '</strong></p><hr></div><p style="margin-left:3em; margin-right:3em"><small><strong>Description:</strong><br/>' + description + '</small></p><p style="margin-right:3em;" align="right"><small><em>Last updated: ' + last_activity + '</small></em></p><center><p align="center" style="width:200px;-webkit-border-radius: 20px;-moz-border-radius: 20px;border-radius: 20px;background-color:light' + label_color + ';"><small><strong>' + label + '</strong></small></p></center></div><hr>'
+			if (description == '') {
+				description = '<em>[empty]</em>'
+				}
+			results = results + '<div style="-webkit-border-radius: 20px;-moz-border-radius: 20px;border:1px solid #000000;border-radius: 20px;background-color:#E0E0E0;"><br/><p style="margin-left:1em; font-size: 125%"><a href="' + url + '">' + name + '</a></p><div style="background-color:' + list_color + ';"><hr><p style="margin-left:1em;"><strong><u>Status</u>: ' + list + '</strong></p><hr></div><p style="margin-left:3em; margin-right:3em"><small><strong>Description:</strong><br/>' + description + '</small></p><p style="margin-right:3em;" align="right"><small><em>Last updated: ' + last_activity + '</small></em></p><center><p align="center" style="width:200px;-webkit-border-radius: 20px;-moz-border-radius: 20px;border-radius: 20px;background-color:light' + label_color + ';"><small><strong>' + label + '</strong></small></p></center></div><hr>'
 			}
 		$('#results').html('There are <u>' + t.cards.length + '</u> <span style="color:#993333">results</span> for this search.<br/><br/>' + results)
 			
