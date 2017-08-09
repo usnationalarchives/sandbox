@@ -1,0 +1,61 @@
+<html>
+<head>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script>
+$(document).ready(function() {
+	$.getJSON('https://catalog.archives.gov/api/v1?naIds=7687199', function(t) {
+		$('#collection').html('<a href="https://catalog.archives.gov/id/' + t.opaResponse.results.result[0].description.series.parentCollection.naId + '">' + t.opaResponse.results.result[0].description.series.parentCollection.title + '</a>');
+		$('#series').html('<a href="https://catalog.archives.gov/id/' + t.opaResponse.results.result[0].description.series.naId + '">' + t.opaResponse.results.result[0].description.series.title + '</a>');
+		$('#dates').html(t.opaResponse.results.result[0].description.series.inclusiveDates.inclusiveStartDate.year + '&ndash;' + t.opaResponse.results.result[0].description.series.inclusiveDates.inclusiveEndDate.year);
+				$('#location').html(t.opaResponse.results.result[0].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence.referenceUnitArray.referenceUnit.name);
+				$('#extent').html(t.opaResponse.results.result[0].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence.extent);
+				$('#boxes').html(t.opaResponse.results.result[0].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence.holdingsMeasurementArray.holdingsMeasurement.count);
+			$.getJSON('https://catalog.archives.gov/api/v1?description.fileUnit.parentSeries.naId=7687199&type=description&rows=1000', function(f) {
+			$.getJSON('https://catalog.archives.gov/api/v1?description.item.parentFileUnit.parentSeries.naId=7687199&type=description&rows=1000', function(i) {
+			
+			items = new Array();
+			for (x = 0; x < i.opaResponse.results.result.length; x++) {
+			try {
+				thumbnail = '<img height="50" src="' + i.opaResponse.results.result[x].objects.object[0].thumbnail['@url'] + '">'
+				}
+			catch(err) {
+			thumbnail = ''
+			}
+			link = 'https://catalog.archives.gov/id/' + i.opaResponse.results.result[x].description.item.naId
+			title = i.opaResponse.results.result[x].description.item.title
+			file_unit = i.opaResponse.results.result[x].description.item.parentFileUnit.naId
+			row = '<tr><td align="center" bgcolor="gainsboro">&mdash;</td><td bgcolor="lightgray" align="right">' + thumbnail + '</td><td bgcolor="lightgray">&nbsp; &nbsp; &nbsp;<a href="' + link + '">' + title + '</a></td></tr>'
+			items.push({"file_unit": file_unit, "row": row})
+			}
+			
+			var folders = '';
+			for (n = 0; n < f.opaResponse.results.result.length; n++) {
+			naid = f.opaResponse.results.result[n].description.fileUnit.naId
+			link = 'https://catalog.archives.gov/id/' + naid
+			title = f.opaResponse.results.result[n].description.fileUnit.title
+			box = f.opaResponse.results.result[n].description.fileUnit.physicalOccurrenceArray.fileUnitPhysicalOccurrence.mediaOccurrenceArray.mediaOccurrence.containerId
+			
+			folders = folders + '<tr height="50"><td bgcolor="gainsboro" style="text-align:center"><strong>&nbsp; &nbsp; &nbsp;' + box + '&nbsp; &nbsp; &nbsp;</strong></td><td bgcolor="silver" colspan="2">&nbsp; &nbsp; &nbsp;<a href="' + link + '">' + title + '</a></td></tr>'
+			for (y = 0; y < items.length; y++) {
+				if (naid == items[y].file_unit) { 
+					folders = folders + items[y].row
+				}
+			}
+			}
+			$('#folders').html('<table><tr><th bgcolor="gainsboro"><br/>Box</th><th bgcolor="darkgray" colspan="2">Contents<br/></th></tr>' + folders + '</table>')
+			});
+		});
+	});
+})
+</script>
+
+</head>
+<body>
+<br><h1 align=center id="collection"/>
+<h2 align=center><span id="series"></span>, <span id ="dates"></span></h2>
+<h3 align=center><span id="extent"></span> (<span id="boxes"></span> boxes)<br><span id="location"></span></h3><br><br>
+<h3>Folder list</h3>
+  <p id="folders"></p>
+
+</body>
+</html>
