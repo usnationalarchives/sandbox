@@ -28,21 +28,22 @@ $(document).ready(function() {
 			items.push({"file_unit": file_unit, "row": row})
 			}
 			
-			var folders = '';
+			var folders = new Array();
 			for (n = 0; n < f.opaResponse.results.result.length; n++) {
 			naid = f.opaResponse.results.result[n].description.fileUnit.naId
 			link = 'https://catalog.archives.gov/id/' + naid
 			title = f.opaResponse.results.result[n].description.fileUnit.title
 			box = f.opaResponse.results.result[n].description.fileUnit.physicalOccurrenceArray.fileUnitPhysicalOccurrence.mediaOccurrenceArray.mediaOccurrence.containerId
 			
-			folders = folders + '<tr height="50"><td bgcolor="gainsboro" style="text-align:center"><strong>&nbsp; &nbsp; &nbsp;' + box + '&nbsp; &nbsp; &nbsp;</strong></td><td bgcolor="silver" colspan="2">&nbsp; &nbsp; &nbsp;<a href="' + link + '">' + title + '</a></td></tr>'
+			folder = '<tr height="50"><td bgcolor="gainsboro" style="text-align:center"><strong>&nbsp; &nbsp; &nbsp;' + box + '&nbsp; &nbsp; &nbsp;</strong></td><td bgcolor="silver" colspan="2">&nbsp; &nbsp; &nbsp;<a href="' + link + '">' + title + '</a></td></tr>'
 			for (y = 0; y < items.length; y++) {
 				if (naid == items[y].file_unit) { 
-					folders = folders + items[y].row
+					folder = folder + items[y].row
 				}
 			}
+			folders.push(folder)
 			}
-			$('#folders').html('<table><tr><th bgcolor="gainsboro"><br/>Box</th><th bgcolor="darkgray" colspan="2">Contents<br/></th></tr>' + folders + '</table>')
+			$('#folders').html('<table><tr><th bgcolor="gainsboro"><br/>Box</th><th bgcolor="darkgray" colspan="2">Contents<br/></th></tr>' + folders.join() + '</table>')
 			});
 		});
 	});
