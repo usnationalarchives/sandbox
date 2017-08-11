@@ -41,9 +41,16 @@ $(document).ready(function() {
 					folder = folder + items[y].row
 				}
 			}
-			folders.push(folder)
+			folders.push({"box": box, "folder": folder})
+			folders.sort(function(a, b) {
+				return parseFloat(a.box) - parseFloat(b.box);
+			});
+			rows = new Array();
+			for (z = 0; z < folders.length; z++) {
+			rows.push(folders[z].folder);
 			}
-			$('#folders').html('<table><tr><th bgcolor="gainsboro"><br/>Box</th><th bgcolor="darkgray" colspan="2">Contents<br/></th></tr>' + folders.join() + '</table>')
+			}
+			$('#folders').html('<table><tr><th bgcolor="gainsboro"><br/>Box</th><th bgcolor="darkgray" colspan="2">Contents<br/></th></tr>' + rows.join('') + '</table>')
 			});
 		});
 	});
