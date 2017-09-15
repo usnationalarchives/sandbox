@@ -23,3 +23,11 @@ For users without GitHub accounts, feedback can be emailed to developer@nara.gov
 | [Digitized Records from Presidential Libraries](https://usnationalarchives.github.io/sandbox/presidential_libraries_portal.html) | View digitized materials from each of the Presidential Libraries. | __&#x1F4CB; — Seeking feedback__ |
 ||||
 | [Transcribe](https://usnationalarchives.github.io/sandbox/transcription_mission.html) | Discover and transcribe untranscribed documents from the National Archives Catalog. | &#x1F6A7; — __In progress__ |
+||||
+| [Digitization Project Board Search](https://usnationalarchives.github.io/sandbox/digitization-search.html) | Search our Digitization Project Board to find where specific records are in the process and if they're available in the National Archives Catalog. | &#x1F6A7; — __In progress__ |
+||||
+| [Herbert Hoover Finding Aid](https://usnationalarchives.github.io/sandbox/hoover.html) | Our first attempt at replicating a traditional finding aid using the National Archives Catalog API. | &#x1F6A7; — __In progress__ |
+||||
+| [Statistical Summary of Holdings](https://usnationalarchives.github.io/sandbox/statistical_summary.html) | Provides statistical information about archival records in our custody that are currently described in the National Archives Catalog. | &#x1F6A7; — __In progress__ |
+||||
+| [Hierarchical Browse](https://usnationalarchives.github.io/sandbox/browse.html) | Drill-down functionality to browse our holdings according to the archival hierarchy, starting with Record Group. | &#x1F6A7; — __In progress__ |
