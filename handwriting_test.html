@@ -55,7 +55,7 @@ $(document).ready(function() {
 		credential = x.opaResponse.credentials;
 					
 		$('#img').html('<br/><img src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Lightness_rotate_36f_cw.gif"/><br/><strong>finding image...</strong>');
-		url = 'https://catalog.archives.gov/api/v1?objects.object.publicContributions.tags.tag_not=%22handwriting%22%20or%20%22typed%22%20or%20%22can%27t%20be%20transcribed%22&type=object&description.fileUnit.generalRecordsTypeArray.generalRecordsType.naId_is=10035676&resultFields=parentDescriptionNaId,num,objects.object.file,objects.object.technicalMetadata&rows=1&cursorMark=' + cursor + '&sort=naIdSort%20asc'
+		url = 'https://catalog.archives.gov/api/v1?objects.object.publicContributions.tags.tag_not=%22handwriting%22%20or%20%22typed%22%20or%20%22cannot%20be%20transcribed%22%20or%20%22handwriting/typed%22&type=object&description.fileUnit.generalRecordsTypeArray.generalRecordsType.naId_is=10035676&resultFields=parentDescriptionNaId,num,objects.object.file,objects.object.technicalMetadata&rows=1&cursorMark=' + cursor + '&sort=naIdSort%20asc'
 		$.getJSON(url, function(t) {
 			img = t.opaResponse.results.result[0].objects.object.file['@url'];
 			naid = t.opaResponse.results.result[0].parentDescriptionNaId;
