@@ -1,0 +1,129 @@
+<html><head><meta content="text/html; charset=UTF-8" http-equiv="content-type"><style type="text/css">ol{margin:0;padding:0}table td,table th{padding:0}.c5{color:#4a86e8;font-weight:400;text-decoration:none;vertical-align:baseline;font-size:14pt;font-family:"Arial";font-style:normal}.c4{color:#000000;font-weight:400;text-decoration:none;vertical-align:baseline;font-size:10pt;font-family:"Arial";font-style:normal}.c0{color:#000000;font-weight:400;text-decoration:none;vertical-align:baseline;font-size:11pt;font-family:"Arial";font-style:normal}.c8{color:#000000;font-weight:400;text-decoration:none;vertical-align:baseline;font-size:11pt;font-family:"Arial";font-style:italic}.c2{padding-top:0pt;padding-bottom:0pt;line-height:1.15;orphans:2;widows:2;text-align:left}.c3{padding-top:0pt;padding-bottom:0pt;line-height:1.15;orphans:2;widows:2;text-align:center}.c1{padding-top:0pt;padding-bottom:0pt;line-height:1.0;orphans:2;widows:2;text-align:left}.c10{padding-top:0pt;padding-bottom:0pt;line-height:1.0;text-align:left}.c14{background-color:#ffffff;max-width:468pt;padding:72pt 72pt 72pt 72pt}.c7{border:1px solid black;margin:5px}.c9{color:#4a86e8;font-size:14pt}.c12{width:33%;height:1px}.c6{height:11pt}.c13{font-style:italic}.c11{font-size:14pt}.title{padding-top:0pt;color:#000000;font-size:26pt;padding-bottom:3pt;font-family:"Arial";line-height:1.15;page-break-after:avoid;orphans:2;widows:2;text-align:left}.subtitle{padding-top:0pt;color:#666666;font-size:15pt;padding-bottom:16pt;font-family:"Arial";line-height:1.15;page-break-after:avoid;orphans:2;widows:2;text-align:left}li{color:#000000;font-size:11pt;font-family:"Arial"}p{margin:0;color:#000000;font-size:11pt;font-family:"Arial"}h1{padding-top:20pt;color:#000000;font-size:20pt;padding-bottom:6pt;font-family:"Arial";line-height:1.15;page-break-after:avoid;orphans:2;widows:2;text-align:left}h2{padding-top:18pt;color:#000000;font-size:16pt;padding-bottom:6pt;font-family:"Arial";line-height:1.15;page-break-after:avoid;orphans:2;widows:2;text-align:left}h3{padding-top:16pt;color:#434343;font-size:14pt;padding-bottom:4pt;font-family:"Arial";line-height:1.15;page-break-after:avoid;orphans:2;widows:2;text-align:left}h4{padding-top:14pt;color:#666666;font-size:12pt;padding-bottom:4pt;font-family:"Arial";line-height:1.15;page-break-after:avoid;orphans:2;widows:2;text-align:left}h5{padding-top:12pt;color:#666666;font-size:11pt;padding-bottom:4pt;font-family:"Arial";line-height:1.15;page-break-after:avoid;orphans:2;widows:2;text-align:left}h6{padding-top:12pt;color:#666666;font-size:11pt;padding-bottom:4pt;font-family:"Arial";line-height:1.15;page-break-after:avoid;font-style:italic;orphans:2;widows:2;text-align:left}</style>
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script type="text/javascript" language="javascript">
+	$(document).ready(function() {
+					
+	window.onload = function WindowLoad() {
+	
+	params = window.location.search.substring(1).split("=");
+	
+	if ((params[0] == 'RG') || (params[0] == 'collection')) {
+		display(params[1])
+		}
+	else {
+		display(594273)
+	}
+	}
+		
+		display = function(naid) {
+		
+		url = 'https://catalog.archives.gov/api/v1?naIds=' + naid
+		
+		$.getJSON(url, function(t) {
+			
+			title = t.opaResponse.results.result[0].description.collection.title;
+			$('#title').html(title);
+			$('#body_title').html(title);
+			$('#body_title2').html(title);
+			reference_unit = t.opaResponse.results.result[0].description.collection.referenceUnits.referenceUnit.name;
+			$('#reference_unit').html(reference_unit);
+			$('#reference_unit2').html(reference_unit);
+			$('#body_reference_unit').html(reference_unit);
+			email = t.opaResponse.results.result[0].description.collection.referenceUnits.referenceUnit.email
+			$('#email').html('<a href="mailto:' + email + '">' + email + '</a>');
+			donor = t.opaResponse.results.result[0].description.collection.personalDonorArray.person.termName
+			$('#donor').html(donor);
+			donor_naid = t.opaResponse.results.result[0].description.collection.personalDonorArray.person.naId
+			scope_and_content = t.opaResponse.results.result[0].description.collection.scopeAndContentNote
+			$('#scope_and_content').html(scope_and_content);
+			$('#catalog').html('<a href="https://catalog.archives.gov/id/' + naid + '">View in catalog</a>')
+			series_count = t.opaResponse.results.result[0].description.collection.seriesCount
+			$('#series_count').html(series_count);
+			$.getJSON('https://catalog.archives.gov/api/v1?naIds=' + donor_naid, function(a) {
+			biography = a.opaResponse.results.result[0].authority.person.biographicalNote
+			$('#biography').html(biography);
+			});
+			$.getJSON('https://catalog.archives.gov/OpaAPI/iapi/v1?action=search&f.level=series&q=*:*&f.parentNaId=' + naid, function(b) {
+			series = '<p style="margin-left: 80px">'
+			for (n = 0; n < b.opaResponse.results.result.length; n++) {
+				series = series + '&middot; ' + b.opaResponse.results.result[n].briefResults.titleLine[0].value + ', ' + b.opaResponse.results.result[n].briefResults.titleLine[1].value + '<br/>'
+			};
+			$('#series').html(series + '</p>');
+			creators = ''
+			for (n = 0; n < b.opaResponse.results.result.length; n++) {
+				creators = creators + '<p style="text-indent: -40px; margin-left: 120px">&middot; ' + b.opaResponse.results.result[n].briefResults.metadataArea[1].value + '</p>'
+			};
+			$('#creators').html(creators);
+			});
+		});
+	
+		}
+	});
+</script>
+	</head>
+
+<body class="c14">
+
+<p class="c2"><span class="c9"><span id="title"></span>&nbsp;| <span id="reference_unit"></span></span></p>
+
+<p class="c2"><span>[Link to printable version]</span><span>&nbsp;| </span><span id="email"></span></p>
+
+<p class="c2"><span id="catalog"></span></p><br/>
+
+<p class="c2"><span class="c5">Collection Overview</span></p><br/>
+
+<p class="c2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Title</strong>: <span class="c8" id="body_title"></span></p><br/>
+
+<p class="c2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Primary Creator</strong>: <span class="c8" id="donor"></span></p><br/>
+
+<p class="c2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Other Creators</strong><br/><br/><span id="creators"></span></p><br/>
+
+<p class="c2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Extent</strong>: <span class="c13">[This doesn&rsquo;t exist yet]</span></p><br/>
+
+<p class="c2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Arrangement</strong>:</p><br/>
+
+<p class="c2"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="c8">[This doesn&rsquo;t exist yet]</span></p><br/>
+
+<p class="c2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span>The "<span id="body_title2"></span>" collection is arranged into <span id="series_count"></span> series:<br/><br/><span id="series"></span></p><br/>
+
+
+
+<p class="c2"><span class="c5">Abstract</span></p><br/>
+
+<p class="c2"><span class="c11">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="c8">[This doesn&rsquo;t exist]</span></p></br/>
+
+<p class="c2"><span class="c5">Scope and Content of the Materials</span></p><br/>
+
+<p class="c2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="scope_and_content"></span></p><br/>
+
+<p class="c2"><span class="c5">Biographical/Administrative History Note</span></p><br/>
+
+<p class="c2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="biography"></span></p><br/>
+
+<p class="c2"><span class="c5">Administrative Information</span></p><br/>
+
+<p class="c2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Repository</strong>: <span id="reference_unit2"></span></p><br/>
+
+<p class="c2"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Access Restrictions: </span><span class="c8">[This doesn&rsquo;t exist yet]</span></p><br/>
+
+<p class="c2"><span class="c13">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span>Use Restrictions: </span><span class="c8">[This doesn&rsquo;t exist yet]</span></p><br/>
+
+<p class="c2"><span class="c13">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span>Separated Materials: </span><span class="c8">[This doesn&rsquo;t exist]</span></p><br/>
+
+<p class="c2"><span class="c5">Box and Folder Listing</span></p><br/>
+
+<p class="c2"><span class="c0">Browse by Series:</span></p><br/>
+
+<p class="c2"><span class="c0">[List of child Series Titles, with anchor links to listing below]</span></p>
+
+<p class="c2"><span class="c0">[All]</span></p>
+
+<p class="c2"><span>[Series Local Identifier]</span><span class="c0">: [Series Title]</span></p>
+
+<p class="c2"><span class="c0">[Series Scope and Content Note]</span></p>
+
+<p class="c2"><span>[Container ID]</span></p>
+
+<p class="c2"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[List of File Unit Titles with this Container ID associated with this Series]</span>
+</body>
