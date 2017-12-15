@@ -301,7 +301,9 @@ table.sortable-onload-0  tr:nth-of-type(odd) {
                $.getJSON(url, function(t) {
 					var images = [];
 					for (i = 0; i < t.opaResponse.results.result.length; i++) {
+						if (t.opaResponse.results.result[i].thumbnailFile != '') {
 						images.push('<a href="https://catalog.archives.gov/id/' + t.opaResponse.results.result[i].naId + '"><img src="https://catalog.archives.gov/OpaAPI/media/' + t.opaResponse.results.result[i].naId + '/' + t.opaResponse.results.result[i].thumbnailFile + '" height="100" alt="' + t.opaResponse.results.result[i].briefResults.titleLine[0].value + '"/></a>');
+						}
 						}
         			total = t.opaResponse.results['@total'];
                   	$('#images').html('<center>' + images.slice(0,500).join('') + '</center>');
