@@ -31,7 +31,7 @@
 	function loadresults(offset) {
 		var start = offset + 1;
 		var end = offset + 25;
-		$('#file_unit_results').html('<center><img width=500 src="https://catalog.archives.gov/images/loader.gif"/></center>');
+		$('#display_results').html('<center><img width=500 src="https://catalog.archives.gov/images/loader.gif"/></center>');
 		var url = 'https://catalog.archives.gov/OpaAPI/iapi/v1?action=search&f.locationIds=7&highlight=true&facet=true&facet.fields=oldScope,level,materialsType,fileFormat,locationIds,dateRangeFacet' + '&q=' + keyword + '&rows=25&offset=' + offset
 	$('#json').html('<small>See results in: <a href="' + url + '">JSON</a> | <a href="' + url + '&format=xml">XML</a></small><br/><br/>');
 	$.getJSON(url, function(t) {
