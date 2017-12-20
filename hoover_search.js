@@ -28,11 +28,6 @@
 		$('#jump').click();
 		});
 	
-	$('#paginate').hide();
-	$('#paginatebottom').hide();
-	$('#json').hide();
-	
-	
 	function loadresults(offset) {
 		var start = offset + 1;
 		var end = offset + 25;
