@@ -18,7 +18,7 @@
 		
 		file_unit = function(series_naid) {
 			$.ajax({
-			url: 'https://catalog.archives.gov/api/v1?rows=100&description.fileUnit.parentSeries.naId=' + series_naid,
+			url: 'https://catalog.archives.gov/api/v1?rows=10&description.fileUnit.parentSeries.naId=' + series_naid,
   async: false,
   dataType: 'json',
   success: function(f) {
