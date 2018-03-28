@@ -16,20 +16,74 @@
 	}
 	}
 		
+		item = function(file_unit_naid) {
+			$.ajax({
+			url: 'https://catalog.archives.gov/api/v1?sort=titleSort asc&rows=10&description.item.parentFileUnit.naId=' + file_unit_naid,
+  async: false,
+  dataType: 'json',
+  success: function(p) {
+		items = '';
+		try {
+			for (u=0; u < p.opaResponse.results.result.length; u++) {
+		item_naid = p.opaResponse.results.result[u].description.item.naId;
+		title = p.opaResponse.results.result[u].description.item.title;
+		month_names = ["", "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
+		try {
+			var date = month_names[p.opaResponse.results.result[u].description.item.productionDateArray.proposableQualifiableDate.month] + ' ' + p.opaResponse.results.result[u].description.item.productionDateArray.proposableQualifiableDate.day + ', ' + p.opaResponse.results.result[u].description.item.productionDateArray.proposableQualifiableDate.year;
+			}
+		catch(err) {
+			try {
+				var date = month_names[p.opaResponse.results.result[u].description.item.productionDateArray.proposableQualifiableDate.month] + ' '+ p.opaResponse.results.result[u].description.item.productionDateArray.proposableQualifiableDate.year;
+				}
+			catch(err) {
+				try {
+				var date = p.opaResponse.results.result[u].description.item.productionDateArray.proposableQualifiableDate.year;
+				}
+				catch(err) {
+			var date = '<em>N/A</em>'
+			}
+			}
+			}
+		try {
+			local_id = p.opaResponse.results.result[u].description.item.localIdentifier;
+			}
+		catch(err) {
+			local_id = '<em>N/A</em>'
+			}
+
+		items = items + '<div style="margin-left:50px"><h5><a href="https://catalog.archives.gov/id/' + item_naid + '">' + title + '</a></h5><p><strong>Date</strong>: ' + date + '</p><p><strong>Local identifier</strong>: ' + local_id + '</p></div>'
+		}
+		}
+		catch(err) {
+		 items = ''
+		}
+		}
+		});
+		return items
+		}
+		
 		file_unit = function(series_naid) {
 			$.ajax({
-			url: 'https://catalog.archives.gov/api/v1?rows=10&description.fileUnit.parentSeries.naId=' + series_naid,
+			url: 'https://catalog.archives.gov/api/v1?rows=10&sort=titleSort asc&description.fileUnit.parentSeries.naId=' + series_naid,
   async: false,
   dataType: 'json',
   success: function(f) {
+  	try {
 		file_units = '<h3>Records of the Committee from the 14th-110th Congress (1816&ndash;2011)</h3>';
 // 		file_units = '<h3>Records of the Committee from the 14th-79th Congress (1816-1946)</h3><h3>Records of the Committee from the 80th-110th Congress (1947-2011)</h3>';
-		try {
 			for (v=0; v < f.opaResponse.results.result.length; v++) {
 		file_unit_naid = f.opaResponse.results.result[v].description.fileUnit.naId;
 		title = f.opaResponse.results.result[v].description.fileUnit.title;
-		start_date = f.opaResponse.results.result[v].description.fileUnit.coverageDates.coverageStartDate.year;
-		end_date = f.opaResponse.results.result[v].description.fileUnit.coverageDates.coverageEndDate.year;
+		try {
+			start_date = f.opaResponse.results.result[v].description.fileUnit.coverageDates.coverageStartDate.year;
+			end_date = f.opaResponse.results.result[v].description.fileUnit.coverageDates.coverageEndDate.year;
+			dates = start_date + '&ndash;' + end_date
+		}
+		catch(err) {
+			dates = '<em>N/A</em>'
+		}
 		try {
 			var extent = f.opaResponse.results.result[v].description.fileUnit.physicalOccurrenceArray.fileUnitPhysicalOccurrence.extent;
 			}
@@ -56,7 +110,7 @@
 			container_id = '<em>N/A</em>'
 			}
 
-		file_units = file_units + '<div style="margin-left:50px"><h4><a href="https://catalog.archives.gov/id/' + file_unit_naid + '">' + title + '</a></h4><p><strong>Dates</strong>: ' + start_date + '&ndash;' + end_date + '</p><p><strong>Extent</strong>: ' + extent + '</p><p><strong>Arrangement</strong>: ' + arrangement + '</p><p>' + scope_and_content + '</p><p><strong>Local identifier</strong>: ' + local_id + '</p><p><strong>Container ID</strong>: ' + container_id + '</p></div>'
+		file_units = file_units + '<div style="margin-left:50px"><h4><a href="https://catalog.archives.gov/id/' + file_unit_naid + '">' + title + '</a></h4><p><strong>Dates</strong>: ' + dates + '</p><p><strong>Extent</strong>: ' + extent + '</p><p><strong>Arrangement</strong>: ' + arrangement + '</p><p>' + scope_and_content + '</p><p><strong>Local identifier</strong>: ' + local_id + '</p><p><strong>Container ID</strong>: ' + container_id + '</p>' + item(file_unit_naid) + '</div>'
 		}
 		}
 		catch(err) {
