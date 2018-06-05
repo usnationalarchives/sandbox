@@ -26,49 +26,135 @@
 
 	$('#json').hide();
 	
-	
 	function loadresults(keyword) {
-		$('#results').html('<center><img width=500 src="https://catalog.archives.gov/images/loader.gif"/></center>');
-		var url = 'https://api.trello.com/1/search/?key=51e4635ad64d4c277ef993f9106d7b9d&token=911174763aa15051aff3a3619d1c4364be8bda8d25e6286a6747f5694275f6c5&idBoards=588f598a84f5411c9d4eaacb&cards_limit=1000&card_board=true&card_list=true&query=' + keyword
 		
-	$('#json').html('<small>See results in: <a href="' + url + '">JSON</a></small><br/>');
+		$('#topresults').html('<tr><td colspan="5"><center><img width=500 src="https://catalog.archives.gov/images/loader.gif"/></center></td></tr>');
+		$('#table').show();
+		var url = 'https://trello.com/b/koF9BuSn/fielded-digitization-tracking-board.json' 
+		
 	$.getJSON(url, function(t) {
-		var results = ''
+		var top_results = ''
+		var load_results = ''
+		count = 0;
 		for (n = 0; n < t.cards.length; n++) { 
-			var name = t.cards[n].name;
-			var url = t.cards[n].url;
-			var description = t.cards[n].desc.replace(/\n\n/g, '<br/>')
-			var label = t.cards[n].labels[0].name
-			var label_color = t.cards[n].labels[0].color
+			var title = t.cards[n].name;
+			var pub = '';
+			var naid = '';
+			var record_group = '';
+			var digi_by = '';
+			var list = t.cards[n].idList;
+			var status = '';
+// 			Available on Partner Website
+			if (list == '5a27058566eaed7756e33deb') {
+				var status = 'style="background-color: #B28DFF"'
+			};
+// 			Awaiting Processing at NARA
+			if (list == '5a27058566eaed7756e33dec') {
+				var status = 'style="background-color: #FFF5BA"'
+			};
+// 			Being Processed at NARA
+			if (list == '5a27058566eaed7756e33ded') {
+				var status = 'style="background-color: #AFCBFF"'
+			};
+// 			Available in National Archives Catalog
+			if (list == '5a27058566eaed7756e33dee') {
+				var status = 'style="background-color: #AFF8DB"'
+			};
+			
+			for (u = 0; u < t.cards[n].customFieldItems.length; u++) { 
+
+				var code = t.cards[n].customFieldItems[u].idCustomField
+				if (code == '5a986700d6afbd6de1c1fa91') {
+					var pub = t.cards[n].customFieldItems[u].value.text
+				};
+				if (code == '5a986700d6afbd6de1c1fa8f') {
+					var naid = t.cards[n].customFieldItems[u].value.number
+				};
+				if (code == '5a986700d6afbd6de1c1fa8d') {
+					var record_group = t.cards[n].customFieldItems[u].value.number
+				};
+				if (code == '5a986700d6afbd6de1c1fa93') {
+					if (t.cards[n].customFieldItems[u].idValue == '5a986700d6afbd6de1c1fa94') {
+						var digi_by = 'Partner'
+					};
+					if (t.cards[n].customFieldItems[u].idValue == '5a986700d6afbd6de1c1fa95') {
+						var digi_by = 'NARA'
+					}
+				};
+			}
+			avail = '';
+			for (r = 0; r < t.cards[n].attachments.length; r++) { 
+				avail = avail + '<a href="' + t.cards[n].attachments[r].url + '">' + t.cards[n].attachments[r].name + '</a><br/>'
+			}
+// 			avail.substr(0, avail.length-2);
+// 			var url = t.cards[n].url;
+// 			var label = t.cards[n].labels[0].name
+// 			var label_color = t.cards[n].labels[0].color
 			var last_activity = new Date(t.cards[n].dateLastActivity)
-			var list = t.cards[n].list.name
-			list_color = ''
-			if (list == 'Available on Partner Website') {
-			list_color = '#FFDFEF'
-			}
-			if (list == 'Available in National Archives Catalog') {
-			list_color = '#E3FBE9'
-			}
-			if (list == 'Awaiting Processing at NARA') {
-			list_color = '#FFE1C6'
-			}
-			if (list == 'Being Processed at NARA') {
-			list_color = '#FFF9CE'
-			}
+// 			var list = t.cards[n].list.name
+// 			list_color = ''
+// 			if (list == 'Available on Partner Website') {
+// 			list_color = '#FFDFEF'
+// 			}
+// 			if (list == 'Available in National Archives Catalog') {
+// 			list_color = '#E3FBE9'
+// 			}
+// 			if (list == 'Awaiting Processing at NARA') {
+// 			list_color = '#FFE1C6'
+// 			}
+// 			if (list == 'Being Processed at NARA') {
+// 			list_color = '#FFF9CE'
+// 			}
 			last_activity = last_activity.toString()
-			
-			var urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
-			description = description.replace(urlRegex, function(url) {
-			return '<a href="' + url + '">' + url + '</a>';
-			});
-			if (description == '') {
-				description = '<em>[empty]</em>'
+// 			
+// 			var urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+// 			description = description.replace(urlRegex, function(url) {
+// 			return '<a href="' + url + '">' + url + '</a>';
+// 			});
+// 			if (description == '') {
+// 				description = '<em>[empty]</em>'
+// 				}
+			if (naid != '') {
+				var catalog_url = 'https://catalog.archives.gov/id/' + naid
+				var title_url = '<a href="' + catalog_url + '">' + title + '</a>'
 				}
-			results = results + '<div style="-webkit-border-radius: 20px;-moz-border-radius: 20px;border:1px solid #000000;border-radius: 20px;background-color:#E0E0E0;"><br/><p style="margin-left:1em; font-size: 125%"><a href="' + url + '">' + name + '</a></p><div style="background-color:' + list_color + ';"><hr><p style="margin-left:1em;"><strong><u>Status</u>: ' + list + '</strong></p><hr></div><p style="margin-left:3em; margin-right:3em"><small><strong>Description:</strong><br/>' + description + '</small></p><p style="margin-right:3em;" align="right"><small><em>Last updated: ' + last_activity + '</small></em></p><center><p align="center" style="width:200px;-webkit-border-radius: 20px;-moz-border-radius: 20px;border-radius: 20px;background-color:light' + label_color + ';"><small><strong>' + label + '</strong></small></p></center></div><hr>'
-			}
-		$('#results').html('There are <u>' + t.cards.length + '</u> <span style="color:#993333">results</span> for this search.<br/><br/>' + results)
+			else {
+				var title_url = title
+				}
+			new_result = '<tr title="Last updated: ' + last_activity + '" scope="row"> <td ' + status + '> </td> <td>' + pub + '</td> <td>' + title_url + '</td> <td>' + avail + '</td> <td>' + record_group + '</td> </tr>'
 			
-			$('#json').show();
+// 			'<div style="-webkit-border-radius: 20px;-moz-border-radius: 20px;border:1px solid #000000;border-radius: 20px;background-color:#E0E0E0;"><br/><p style="margin-left:1em; font-size: 125%"> Title: ' + title + '</p><p style="margin-left:1em; font-size: 125%"> NAID: ' + naid + '</p><p style="margin-left:1em; font-size: 125%"> Status: ' + status + '</p><p style="margin-left:1em; font-size: 125%"> Digitized by: ' + digi_by + '</p><p style="margin-left:1em; font-size: 125%"> Microfilm Publication: ' + pub + '</p><p style="margin-left:1em; font-size: 125%"> Record Group: ' + record_group + '</p><p style="margin-left:1em; font-size: 125%"> Last updated: ' + last_activity + '</p></center></div><hr>';
+			if (count <= 9) {
+				if ((keyword != '') && (keyword != '*')) {
+					if (new_result.toLowerCase().includes(keyword.toLowerCase())) {
+					top_results = top_results + new_result;
+					count = count + 1
+					}
+				}
+				else {
+					top_results = top_results + new_result;
+					count = count + 1
+				}
+			}
+			else {
+				if ((keyword != '') && (keyword != '*')) {
+					if (new_result.toLowerCase().includes(keyword.toLowerCase())) {
+					load_results = load_results + new_result;
+					count = count + 1
+					}
+				}
+				else {
+					load_results = load_results + new_result;
+					count = count + 1
+				}
+			}
+			}
+		$('#resultcount').html('There are <u>' + count + '</u> <span style="color:#993333">results</span> for this search.');
+			$('#topresults').html(top_results)
+			$('#loadresults').html(load_results)
+			if (count > 10) {
+				$('#load').show();
+			}
 				
 	   });
 	}
@@ -83,4 +169,8 @@
 		window.location.href = newUrl;
 
 		});
+		$("#load").click(function(event){
+			$('#load').hide();
+			$('#loadresults').show();
+			});
 })

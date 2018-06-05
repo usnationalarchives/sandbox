@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digitization Board</title>
+    <link rel="stylesheet" href="uswds.css">
+    <style>.section-theme #title-bar{background:#29393b url("https://www.archives.gov/files/global-images/section-headers/research1.png") no-repeat center right;}.section-theme #mega-footer > h2{background:#29393b}.section-theme #title-bar .breadcrumb{background-color:rgba(93,131,138,0.5);}.section-theme th{background-color:#29393b !important;}.section-theme .btn-primary{background-color:#29393b;border-color:#29393b;}.section-theme .btn-primary:focus,.section-theme .btn-primary:hover,.section-theme .btn-primary:active,.section-theme .btn-primary:visited{background-color:rgba(93,131,138,0.5);color:#fff;}
+
+	div#banner { 
+       top: 0; 
+       left: 0; 
+       background-color: pink; 
+       width: 100%; 
+     }
+	div#banner-content { 
+       margin: 0 auto; 
+       padding: 10px; 
+       border: 1px solid #000;
+     }
+</style>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+      <script type="text/javascript" src="trello-search.js"></script>
+  </head>
+  <body>
+    <div id="banner">
+        <div id="banner-content">
+            Attention: This web page is for demonstration purposes only, and is not an official publication of the National Archives and Records Administration.<br/><a href="https://github.com/usnationalarchives/sandbox/blob/master/README.md#whats-this-for">Read more</a>.
+        </div>
+    </div>      
+    <div class="usa-grid">
+            <div class="usa-width-one-whole">
+                <h1>Microfilm Publications and Original Records Digitized by Our Digitization Partners</h1>
+            </div>
+        <div class="usa-width-one-half">
+            <p>
+                Our digitization partners, Ancestry.com, Fold3.com, and Familysearch.org, have digitized selected NARA microfilm publications and original records and made them available on their web sites. The list below includes all microfilm and original records that have been either partially or wholly digitized by the partners.
+            </p><p>
+                The agreements with our partners are such that after a certain time period, all these digitized images will become available for free through the National Archives Catalog. Below we have indicated the progress of each title, with links to the National Archives Catalog when available.
+            </p><p>
+                If any problems are discovered with the links or a title is missing, please report the information to digitization@nara.gov.
+            </p><p>
+                Return to the Digitization main page
+            </p>
+        </div>
+        <div class="usa-width-one-half">
+                <div class="usa-alert usa-alert-info" >
+                        <div class="usa-alert-body"><h3 class="usa-alert-heading">Please note:</h3><p class="usa-alert-text">
+                                Family Search is a free site.
+                            </p>
+                        <p>
+                                Free access to Ancestry and Fold3 is available in all Research Rooms at the National Archives, including those in our regional archives and Presidential Libraries.
+                            </p>
+                        <p>
+                                Ancestry and Fold3 are subscription services that allow free searches of some or all index terms for each title.
+                            </p>
+                                If you see duplicate entries for the same microfilm number and partner, you should click on both entries as it likely means that the partner split the title, and the links go to different records
+                        </p>
+                        </div>
+                      </div>
+        </div>
+      </div>
+
+      <div class="usa-grid">
+        <div class="usa-width-one-third">
+                <div role="search">
+                        <form class="usa-search usa-search-big">
+                          <label class="usa-sr-only" for="search-field-big">Search big</label>
+                          <input id="keyword" placeholder="keyword" type="search" name="q">
+                          <button type="submit" id="input">
+                            <span class="usa-search-submit-text">Search</span>
+                          </button>
+                        </form>
+                      </div>
+        </div>
+        <div class="usa-width-two-thirds">tags</div>
+      </div>
+
+      <div class="usa-grid">
+        <div class="usa-width-one-whole">
+        <p id="resultcount"></p>
+                <table style="display:none" id="table" class="usa-table-borderless">
+                        <caption>Should we add a table caption?</caption>
+                        <thead>
+                          <tr>
+                            <th id="status" scope="col">Status</th>
+                            <th id="source" scope="col">Digitized Source</th>
+                            <th id="title" scope="col">NARA Title</th>
+                            <th scope="col">Available On</th>
+                            <th id="rec" scope="col">Record Group</th>
+                          </tr>
+                        </thead>
+                        <tbody id="topresults"></tbody>
+                        <tr style="display:none" id="load" ><td colspan="5"><center><button width="100%">Load all</button></center></td></tr>
+                        <tbody style="display:none" id="loadresults"></tbody>
+                      </table>
+        </div>
+      </div>
+  </body>
+  </html>
