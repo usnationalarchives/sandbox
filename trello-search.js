@@ -84,36 +84,23 @@
 			}
 			avail = '';
 			for (r = 0; r < t.cards[n].attachments.length; r++) { 
-				avail = avail + '<a href="' + t.cards[n].attachments[r].url + '">' + t.cards[n].attachments[r].name + '</a><br/>'
+				avail = avail + '<a href="' + t.cards[n].attachments[r].url + '">' + t.cards[n].attachments[r].name.replace('Ancestry@nara', 'Ancestry@NARA') + '</a><br/>'
+			
+			if (t.cards[n].attachments[r].name.toLowerCase().includes('ancestry@nara')) {
+				avail = avail + '<a href="' + t.cards[n].attachments[r].url.replace('search.ancestryinstitution', 'search.ancestry') + '">' + 'Ancestry$' + '</a><br/>'
 			}
-// 			avail.substr(0, avail.length-2);
-// 			var url = t.cards[n].url;
-// 			var label = t.cards[n].labels[0].name
-// 			var label_color = t.cards[n].labels[0].color
+			if (t.cards[n].attachments[r].name.toLowerCase().includes('ancestry$')) {
+				avail = avail + '<a href="' + t.cards[n].attachments[r].url.replace('search.ancestry.', 'search.ancestryinstitution.') + '">' + 'Ancestry@NARA' + '</a><br/>'
+			}
+			}
+			
 			var last_activity = new Date(t.cards[n].dateLastActivity)
-// 			var list = t.cards[n].list.name
-// 			list_color = ''
-// 			if (list == 'Available on Partner Website') {
-// 			list_color = '#FFDFEF'
-// 			}
-// 			if (list == 'Available in National Archives Catalog') {
-// 			list_color = '#E3FBE9'
-// 			}
-// 			if (list == 'Awaiting Processing at NARA') {
-// 			list_color = '#FFE1C6'
-// 			}
-// 			if (list == 'Being Processed at NARA') {
-// 			list_color = '#FFF9CE'
-// 			}
 			last_activity = last_activity.toString()
 // 			
 // 			var urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
 // 			description = description.replace(urlRegex, function(url) {
 // 			return '<a href="' + url + '">' + url + '</a>';
 // 			});
-// 			if (description == '') {
-// 				description = '<em>[empty]</em>'
-// 				}
 			if (naid != '') {
 				var catalog_url = 'https://catalog.archives.gov/id/' + naid
 				var title_url = '<a href="' + catalog_url + '">' + title + '</a>'
@@ -123,7 +110,6 @@
 				}
 			new_result = '<tr title="Last updated: ' + last_activity + '" scope="row"> <td ' + status + '> </td> <td>' + pub + '</td> <td>' + title_url + '</td> <td>' + avail + '</td> <td>' + record_group + '</td> </tr>'
 			
-// 			'<div style="-webkit-border-radius: 20px;-moz-border-radius: 20px;border:1px solid #000000;border-radius: 20px;background-color:#E0E0E0;"><br/><p style="margin-left:1em; font-size: 125%"> Title: ' + title + '</p><p style="margin-left:1em; font-size: 125%"> NAID: ' + naid + '</p><p style="margin-left:1em; font-size: 125%"> Status: ' + status + '</p><p style="margin-left:1em; font-size: 125%"> Digitized by: ' + digi_by + '</p><p style="margin-left:1em; font-size: 125%"> Microfilm Publication: ' + pub + '</p><p style="margin-left:1em; font-size: 125%"> Record Group: ' + record_group + '</p><p style="margin-left:1em; font-size: 125%"> Last updated: ' + last_activity + '</p></center></div><hr>';
 			if (count <= 9) {
 				if ((keyword != '') && (keyword != '*')) {
 					if (new_result.toLowerCase().includes(keyword.toLowerCase())) {
