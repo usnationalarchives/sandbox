@@ -15,9 +15,14 @@
       box-sizing: border-box;
     }
 
-    .slider {
+    .listslider {
         width: 80%;
-        margin: 100px auto;
+        margin: 10px auto;
+    }
+
+    .mainslider {
+        width: 60%;
+        margin: 10px auto;
     }
 
     .slick-slide {
@@ -159,8 +164,8 @@ $.getJSON(url, function(t) {
     });
 </script>
 <body>
-<h1 align="center">What's New in the Catalog</h1>
-  <section class="autoplay slider">
+<br/><h1 align="center">What's New in the Catalog</h1>
+  <section class="autoplay listslider">
       <span id="listobject1"></span>
       <span id="listobject2"></span>
       <span id="listobject3"></span>
@@ -261,8 +266,8 @@ $.getJSON(url, function(t) {
       <span id="listobject98"></span>
       <span id="listobject99"></span>
       <span id="listobject100"></span>
-	</section>
-  <section class="main slider">
+	</section><hr width="80%"/>
+  <section class="main mainslider">
       <span id="mainobject1"></span>
       <span id="mainobject2"></span>
       <span id="mainobject3"></span>
