@@ -59,11 +59,11 @@
 $(document).ready(function() {
 
 var cursor = '*'
-url = 'https://catalog.archives.gov/api/v1?resultTypes=object&exists=objects.object.thumbnail&sort=objectId%20desc&rows=100&cursorMark=' + cursor
+url = 'https://catalog.archives.gov/api/v1?type=description&exists=objects.object.thumbnail&sort=naIdSort%20desc&rows=100&cursorMark=' + cursor
 $.getJSON(url, function(t) {
 	var object_list = ''
 	for (f = 0; f < t.opaResponse.results.result.length; f++) {
-		var url = 'https://catalog.archives.gov/id/' + t.opaResponse.results.result[f].parentDescriptionNaId.toString()
+		var url = 'https://catalog.archives.gov/id/' + t.opaResponse.results.result[f].naId.toString()
 		var object_url = t.opaResponse.results.result[f].objects.object.file['@url'];
 		var thumb_url = t.opaResponse.results.result[f].objects.object.thumbnail['@url'];
 		var object_list_item = '<div>\
