@@ -1,0 +1,91 @@
+<html>
+<title>Citizen archivist stats</title>
+<head>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script type="text/javascript" language="javascript">
+
+$(document).ready(function() {
+
+	window.onload = function WindowLoad() {
+			
+		query = window.location.search.substring(1).split("?");
+
+// Parses the URL to extract the keyword value if a URL parameter is present.
+
+		if (query[0] !== '') {
+			$('#search').html('Calculating...');
+			tag = query[0].split("=")[1] 
+			$('#name').html('<a href="https://catalog.archives.gov/search?q=*:*&filter=(tagsExact:%22' + tag + '%22)">' + tag + '</a>')
+			loadresults(tag)
+		}
+	}
+
+// Allow users to use 'enter' key on search box.
+	
+	$('#tag').keypress(function(enter){
+		if(enter.keyCode==13)
+		$('#input').click();
+		});
+
+	function loadresults(tag) {
+		var url = 'https://catalog.archives.gov/api/v1?publicContributions.tags.tag=' + tag + '&type=description&resultFields=naId,num,publicContributions,objects.object.publicContributions.transcription.users&rows=10000'
+		$.getJSON(url, function(t) {
+			naids = [];
+			objects = [];
+			users = [];
+			
+			for (f = 0; f < t.opaResponse.results.result.length; f++) {
+				naids.push(t.opaResponse.results.result[f].naId)
+				try {
+					if (t.opaResponse.results.result[f].objects.object.constructor === Array) { 
+					for (h = 0; h < t.opaResponse.results.result[f].objects.object.length; h++) {
+						objects.push( t.opaResponse.results.result[f].objects.object[h]['@id'] )
+						
+						if (t.opaResponse.results.result[f].objects.object[h].publicContributions.transcription.users.user.constructor === Array) {
+						for (j = 0; j < t.opaResponse.results.result[f].objects.object[h].publicContributions.transcription.users.user.length; j++) {
+							users.push(t.opaResponse.results.result[f].objects.object[h].publicContributions.transcription.users.user[j]['@user'].toLowerCase() )
+						}
+						}
+						else {
+						users.push(t.opaResponse.results.result[f].objects.object[h].publicContributions.transcription.users.user['@user'].toLowerCase() )
+						}
+					}
+					}
+					else {
+						objects.push(t.opaResponse.results.result[f].objects.object['@id'])
+						if (t.opaResponse.results.result[f].objects.object.publicContributions.transcription.users.user.constructor === Array) {
+						for (j = 0; j < t.opaResponse.results.result[f].objects.object.publicContributions.transcription.users.user.length; j++) {
+							users.push(t.opaResponse.results.result[f].objects.object.publicContributions.transcription.users.user[j]['@user'].toLowerCase() )
+						}
+						}
+						else {
+						users.push(t.opaResponse.results.result[f].objects.object.publicContributions.transcription.users.user['@user'].toLowerCase() )
+						}
+					}
+				} 
+				catch(error) {}
+			}
+			contributors = [...new Set(users)]
+			$('#search').hide();
+			$('#naids').html('<p align="right"><a href="' + window.location.pathname + '">Return to search</a></p><p>There are <strong>' + naids.length + '</strong> tagged descriptions with <strong>' + objects.length + '</strong> total transcriptions, <strong>'+ users.length + '</strong> total versions saved, and <strong>' + contributors.length + '</strong> unique contributors.</p><ul><li>' + contributors.sort().join('</li><li>') + '</li></ul>')
+		});
+	}
+	$("#input").click(function(event){
+		
+		var url = window.location.pathname;
+		
+		tag = $('#tag').val();
+		if (tag !== '') { tag = '?tag=' + tag };
+		newUrl=url.replace(tag,"");
+		newUrl+=tag;
+		window.location.href = newUrl;
+
+	});
+})
+</script>
+</head>
+<body>
+<h1 align="center" id="name">Generate citizen archivist campaign stats</h1>
+<p id="naids"><center><br/><span id="search"><input type="search" style="width:280px" id="tag" placeholder="tag" /> <input style="width:75px" type="button" id="input" value="Generate" /></span></center></p>
+</body>
+</html>
