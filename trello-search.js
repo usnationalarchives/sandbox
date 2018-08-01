@@ -4,7 +4,9 @@
 	window.onload = function WindowLoad() {
 			
 		query = window.location.search.substring(1).split("&");
-		
+
+// Parses the URL to extract the keyword value if a URL parameter is present.
+
 		if (query[0] !== '') {
 			params = new String();
 			for (p = 0; p < query.length; p++) {
@@ -17,14 +19,13 @@
 
 	}
 	}
-	
+
+// Allow users to use 'enter' key on search box.
 	
 	$('#keyword').keypress(function(enter){
 		if(enter.keyCode==13)
 		$('#input').click();
 		});
-
-	$('#json').hide();
 	
 	function loadresults(keyword) {
 		

@@ -3,7 +3,8 @@
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 <script>
 $(document).ready(function() {
-	$.getJSON('https://catalog.archives.gov/api/v1?naIds=7687199', function(t) {
+	var base_naid = 7687199
+	$.getJSON('https://catalog.archives.gov/api/v1?naIds=' + base_naid, function(t) {
 		$('#title').html('<title>Finding Aid: ' + t.opaResponse.results.result[0].description.series.title + ' | National Archives</title>')
 		
 		$('#collection').html('<a href="https://catalog.archives.gov/id/' + t.opaResponse.results.result[0].description.series.parentCollection.naId + '">' + t.opaResponse.results.result[0].description.series.parentCollection.title + '</a>');
@@ -12,8 +13,8 @@ $(document).ready(function() {
 				$('#location').html(t.opaResponse.results.result[0].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence.referenceUnitArray.referenceUnit.name);
 				$('#extent').html(t.opaResponse.results.result[0].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence.extent);
 				$('#boxes').html(t.opaResponse.results.result[0].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence.holdingsMeasurementArray.holdingsMeasurement.count);
-			$.getJSON('https://catalog.archives.gov/api/v1?description.fileUnit.parentSeries.naId=7687199&type=description&rows=1000', function(f) {
-			$.getJSON('https://catalog.archives.gov/api/v1?description.item.parentFileUnit.parentSeries.naId=7687199&type=description&rows=1000', function(i) {
+			$.getJSON('https://catalog.archives.gov/api/v1?description.fileUnit.parentSeries.naId=' + base_naid + '&type=description&rows=1000', function(f) {
+			$.getJSON('https://catalog.archives.gov/api/v1?description.item.parentFileUnit.parentSeries.naId=' + base_naid + '&type=description&rows=1000', function(i) {
 			
 			items = new Array();
 			for (x = 0; x < i.opaResponse.results.result.length; x++) {
