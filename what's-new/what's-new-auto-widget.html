@@ -64,8 +64,14 @@ $.getJSON(url, function(t) {
 	var object_list = ''
 	for (f = 0; f < t.opaResponse.results.result.length; f++) {
 		var url = 'https://catalog.archives.gov/id/' + t.opaResponse.results.result[f].naId.toString()
-		var object_url = t.opaResponse.results.result[f].objects.object.file['@url'];
-		var thumb_url = t.opaResponse.results.result[f].objects.object.thumbnail['@url'];
+		try {
+			var object_url = t.opaResponse.results.result[f].objects.object.file['@url'];
+			var thumb_url = t.opaResponse.results.result[f].objects.object.thumbnail['@url']
+		}
+		catch {
+			var object_url = t.opaResponse.results.result[f].objects.object[0].file['@url'];
+			var thumb_url = t.opaResponse.results.result[f].objects.object[0].thumbnail['@url']
+		}
 // 		try {
 		var title = t.opaResponse.results.result[f].description.item.title
 		var creator = t.opaResponse.results.result[f].description.item.parentFileUnit.parentSeries.creatingOrganizationArray.creatingOrganization.creator.termName

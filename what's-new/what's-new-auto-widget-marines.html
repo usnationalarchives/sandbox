@@ -21,7 +21,7 @@
     }
 
     .mainslider {
-        width: 60%;
+        width: 80%;
         margin: 10px auto;
     }
 
@@ -59,7 +59,7 @@
 $(document).ready(function() {
 
 var cursor = '*'
-url = 'https://catalog.archives.gov/api/v1?type=description&exists=objects.object.thumbnail&sort=naIdSort%20desc&rows=100&cursorMark=' + cursor
+url = 'https://catalog.archives.gov/api/v1?type=description&description.item.parentFileUnit.parentSeries.parentRecordGroup.recordGroupNumber=127&exists=objects.object.thumbnail&resultFields=description,naId,num,objects.object.thumbnail,objects.object.file&sort=naIdSort%20desc&rows=100&cursorMark=' + cursor
 $.getJSON(url, function(t) {
 	var object_list = ''
 	for (f = 0; f < t.opaResponse.results.result.length; f++) {
@@ -72,19 +72,31 @@ $.getJSON(url, function(t) {
 			var object_url = t.opaResponse.results.result[f].objects.object[0].file['@url'];
 			var thumb_url = t.opaResponse.results.result[f].objects.object[0].thumbnail['@url']
 		}
+// 		try {
+		var title = t.opaResponse.results.result[f].description.item.title
+		var creator = t.opaResponse.results.result[f].description.item.parentFileUnit.parentSeries.creatingOrganizationArray.creatingOrganization.creator.termName
+// 		}
+// 		catch(err) {
+// 		var title = t.opaResponse.results.result[f].description.fileUnit.title
+// 		var creator = t.opaResponse.results.result[f].description.fileUnit.creatingOrganizationArray.creatingOrganization.creator.termName
+// 		}
 		var object_list_item = '<div>\
 		<a href="' + url + '"><img data-lazy="' + thumb_url + '"></a>\
 		</div>'
-		var object_main_item = '<div>\
-		<a href="' + url + '"><img data-lazy="' + object_url + '"></a>\
-		</div>'
+		var metadata = '<strong>Title</strong>: "<a href="' + url + '">' + title + '</a>"<br/><strong>Creator</strong>: ' + creator
+		
+// 		var object_main_item = '<div>\
+// 		<a href="' + url + '"><img data-lazy="' + object_url + '"></a>\
+// 		</div>'
 		
 		$('#listobject' + (f + 1).toString()).html('\
 		' + object_list_item)
 // 		$('#mainobject' + (f + 1).toString()).html('\
 // 		' + object_main_item)
-		$('#mainobject' + (f + 1).toString()).html('\
-		' + object_list_item)
+// 		$('#mainobject' + (f + 1).toString()).html('\
+// 		' + object_list_item)
+		$('#objectmetadata' + (f + 1).toString()).html('\
+		' + metadata)
 	}
 });
 })
@@ -172,13 +184,12 @@ $.getJSON(url, function(t) {
     });
 </script>
 <body>
-<br/><h1 align="center">What's New in the Catalog</h1>
   <section class="autoplay listslider">
-      <span id="listobject1">Loading...</span>
+      <span id="listobject1"></span>
       <span id="listobject2"></span>
       <span id="listobject3"></span>
       <span id="listobject4"></span>
-      <span id="listobject5"></span>
+      <span id="listobject5">Loading...</span>
       <span id="listobject6"></span>
       <span id="listobject7"></span>
       <span id="listobject8"></span>
@@ -274,108 +285,108 @@ $.getJSON(url, function(t) {
       <span id="listobject98"></span>
       <span id="listobject99"></span>
       <span id="listobject100"></span>
-	</section><hr width="80%"/>
+	</section>
   <section class="main mainslider">
-      <span id="mainobject1"></span>
-      <span id="mainobject2"></span>
-      <span id="mainobject3"></span>
-      <span id="mainobject4"></span>
-      <span id="mainobject5"></span>
-      <span id="mainobject6"></span>
-      <span id="mainobject7"></span>
-      <span id="mainobject8"></span>
-      <span id="mainobject9"></span>
-      <span id="mainobject10"></span>
-      <span id="mainobject11"></span>
-      <span id="mainobject12"></span>
-      <span id="mainobject13"></span>
-      <span id="mainobject14"></span>
-      <span id="mainobject15"></span>
-      <span id="mainobject16"></span>
-      <span id="mainobject17"></span>
-      <span id="mainobject18"></span>
-      <span id="mainobject19"></span>
-      <span id="mainobject20"></span>
-      <span id="mainobject21"></span>
-      <span id="mainobject22"></span>
-      <span id="mainobject23"></span>
-      <span id="mainobject24"></span>
-      <span id="mainobject25"></span>
-      <span id="mainobject26"></span>
-      <span id="mainobject27"></span>
-      <span id="mainobject28"></span>
-      <span id="mainobject29"></span>
-      <span id="mainobject30"></span>
-      <span id="mainobject31"></span>
-      <span id="mainobject32"></span>
-      <span id="mainobject33"></span>
-      <span id="mainobject34"></span>
-      <span id="mainobject35"></span>
-      <span id="mainobject36"></span>
-      <span id="mainobject37"></span>
-      <span id="mainobject38"></span>
-      <span id="mainobject39"></span>
-      <span id="mainobject40"></span>
-      <span id="mainobject41"></span>
-      <span id="mainobject42"></span>
-      <span id="mainobject43"></span>
-      <span id="mainobject44"></span>
-      <span id="mainobject45"></span>
-      <span id="mainobject46"></span>
-      <span id="mainobject47"></span>
-      <span id="mainobject48"></span>
-      <span id="mainobject49"></span>
-      <span id="mainobject50"></span>
-      <span id="mainobject51"></span>
-      <span id="mainobject52"></span>
-      <span id="mainobject53"></span>
-      <span id="mainobject54"></span>
-      <span id="mainobject55"></span>
-      <span id="mainobject56"></span>
-      <span id="mainobject57"></span>
-      <span id="mainobject58"></span>
-      <span id="mainobject59"></span>
-      <span id="mainobject60"></span>
-      <span id="mainobject61"></span>
-      <span id="mainobject62"></span>
-      <span id="mainobject63"></span>
-      <span id="mainobject64"></span>
-      <span id="mainobject65"></span>
-      <span id="mainobject66"></span>
-      <span id="mainobject67"></span>
-      <span id="mainobject68"></span>
-      <span id="mainobject69"></span>
-      <span id="mainobject70"></span>
-      <span id="mainobject71"></span>
-      <span id="mainobject72"></span>
-      <span id="mainobject73"></span>
-      <span id="mainobject74"></span>
-      <span id="mainobject75"></span>
-      <span id="mainobject76"></span>
-      <span id="mainobject77"></span>
-      <span id="mainobject78"></span>
-      <span id="mainobject79"></span>
-      <span id="mainobject80"></span>
-      <span id="mainobject81"></span>
-      <span id="mainobject82"></span>
-      <span id="mainobject83"></span>
-      <span id="mainobject84"></span>
-      <span id="mainobject85"></span>
-      <span id="mainobject86"></span>
-      <span id="mainobject87"></span>
-      <span id="mainobject88"></span>
-      <span id="mainobject89"></span>
-      <span id="mainobject90"></span>
-      <span id="mainobject91"></span>
-      <span id="mainobject92"></span>
-      <span id="mainobject93"></span>
-      <span id="mainobject94"></span>
-      <span id="mainobject95"></span>
-      <span id="mainobject96"></span>
-      <span id="mainobject97"></span>
-      <span id="mainobject98"></span>
-      <span id="mainobject99"></span>
-      <span id="mainobject100"></span>
+      <span id="objectmetadata1"></span>
+      <span id="objectmetadata2"></span>
+      <span id="objectmetadata3"></span>
+      <span id="objectmetadata4"></span>
+      <span id="objectmetadata5"></span>
+      <span id="objectmetadata6"></span>
+      <span id="objectmetadata7"></span>
+      <span id="objectmetadata8"></span>
+      <span id="objectmetadata9"></span>
+      <span id="objectmetadata10"></span>
+      <span id="objectmetadata11"></span>
+      <span id="objectmetadata12"></span>
+      <span id="objectmetadata13"></span>
+      <span id="objectmetadata14"></span>
+      <span id="objectmetadata15"></span>
+      <span id="objectmetadata16"></span>
+      <span id="objectmetadata17"></span>
+      <span id="objectmetadata18"></span>
+      <span id="objectmetadata19"></span>
+      <span id="objectmetadata20"></span>
+      <span id="objectmetadata21"></span>
+      <span id="objectmetadata22"></span>
+      <span id="objectmetadata23"></span>
+      <span id="objectmetadata24"></span>
+      <span id="objectmetadata25"></span>
+      <span id="objectmetadata26"></span>
+      <span id="objectmetadata27"></span>
+      <span id="objectmetadata28"></span>
+      <span id="objectmetadata29"></span>
+      <span id="objectmetadata30"></span>
+      <span id="objectmetadata31"></span>
+      <span id="objectmetadata32"></span>
+      <span id="objectmetadata33"></span>
+      <span id="objectmetadata34"></span>
+      <span id="objectmetadata35"></span>
+      <span id="objectmetadata36"></span>
+      <span id="objectmetadata37"></span>
+      <span id="objectmetadata38"></span>
+      <span id="objectmetadata39"></span>
+      <span id="objectmetadata40"></span>
+      <span id="objectmetadata41"></span>
+      <span id="objectmetadata42"></span>
+      <span id="objectmetadata43"></span>
+      <span id="objectmetadata44"></span>
+      <span id="objectmetadata45"></span>
+      <span id="objectmetadata46"></span>
+      <span id="objectmetadata47"></span>
+      <span id="objectmetadata48"></span>
+      <span id="objectmetadata49"></span>
+      <span id="objectmetadata50"></span>
+      <span id="objectmetadata51"></span>
+      <span id="objectmetadata52"></span>
+      <span id="objectmetadata53"></span>
+      <span id="objectmetadata54"></span>
+      <span id="objectmetadata55"></span>
+      <span id="objectmetadata56"></span>
+      <span id="objectmetadata57"></span>
+      <span id="objectmetadata58"></span>
+      <span id="objectmetadata59"></span>
+      <span id="objectmetadata60"></span>
+      <span id="objectmetadata61"></span>
+      <span id="objectmetadata62"></span>
+      <span id="objectmetadata63"></span>
+      <span id="objectmetadata64"></span>
+      <span id="objectmetadata65"></span>
+      <span id="objectmetadata66"></span>
+      <span id="objectmetadata67"></span>
+      <span id="objectmetadata68"></span>
+      <span id="objectmetadata69"></span>
+      <span id="objectmetadata70"></span>
+      <span id="objectmetadata71"></span>
+      <span id="objectmetadata72"></span>
+      <span id="objectmetadata73"></span>
+      <span id="objectmetadata74"></span>
+      <span id="objectmetadata75"></span>
+      <span id="objectmetadata76"></span>
+      <span id="objectmetadata77"></span>
+      <span id="objectmetadata78"></span>
+      <span id="objectmetadata79"></span>
+      <span id="objectmetadata80"></span>
+      <span id="objectmetadata81"></span>
+      <span id="objectmetadata82"></span>
+      <span id="objectmetadata83"></span>
+      <span id="objectmetadata84"></span>
+      <span id="objectmetadata85"></span>
+      <span id="objectmetadata86"></span>
+      <span id="objectmetadata87"></span>
+      <span id="objectmetadata88"></span>
+      <span id="objectmetadata89"></span>
+      <span id="objectmetadata90"></span>
+      <span id="objectmetadata91"></span>
+      <span id="objectmetadata92"></span>
+      <span id="objectmetadata93"></span>
+      <span id="objectmetadata94"></span>
+      <span id="objectmetadata95"></span>
+      <span id="objectmetadata96"></span>
+      <span id="objectmetadata97"></span>
+      <span id="objectmetadata98"></span>
+      <span id="objectmetadata99"></span>
+      <span id="objectmetadata100"></span>
 	</section>
 </body>
 </html>
