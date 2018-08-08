@@ -68,18 +68,40 @@ $.getJSON(url, function(t) {
 			var object_url = t.opaResponse.results.result[f].objects.object.file['@url'];
 			var thumb_url = t.opaResponse.results.result[f].objects.object.thumbnail['@url']
 		}
-		catch {
+		catch(err) {
 			var object_url = t.opaResponse.results.result[f].objects.object[0].file['@url'];
 			var thumb_url = t.opaResponse.results.result[f].objects.object[0].thumbnail['@url']
 		}
-// 		try {
-		var title = t.opaResponse.results.result[f].description.item.title
-		var creator = t.opaResponse.results.result[f].description.item.parentFileUnit.parentSeries.creatingOrganizationArray.creatingOrganization.creator.termName
-// 		}
-// 		catch(err) {
-// 		var title = t.opaResponse.results.result[f].description.fileUnit.title
-// 		var creator = t.opaResponse.results.result[f].description.fileUnit.creatingOrganizationArray.creatingOrganization.creator.termName
-// 		}
+// First try is for items vs. file units. Second try is for items that belong to either file units or series. Third try is for creators that are an array or single item.
+
+		try {
+			var title = t.opaResponse.results.result[f].description.item.title
+			try {
+				try {
+					var creator = t.opaResponse.results.result[f].description.item.parentFileUnit.parentSeries.creatingOrganizationArray.creatingOrganization.creator.termName
+				}
+				catch(err) {
+					var creator = t.opaResponse.results.result[f].description.item.parentFileUnit.parentSeries.creatingOrganizationArray.creatingOrganization[0].creator.termName
+				}
+			}
+			catch(err) {
+				try {
+					var creator = t.opaResponse.results.result[f].description.item.parentSeries.creatingOrganizationArray.creatingOrganization.creator.termName
+				}
+				catch(err) {
+					var creator = t.opaResponse.results.result[f].description.item.parentSeries.creatingOrganizationArray.creatingOrganization[0].creator.termName
+				}
+			}
+		}
+		catch(err) {
+			var title = t.opaResponse.results.result[f].description.fileUnit.title
+			try {
+				var creator = t.opaResponse.results.result[f].description.fileUnit.parentSeries.creatingOrganizationArray.creatingOrganization.creator.termName
+			}
+			catch(err) {
+				var creator = t.opaResponse.results.result[f].description.fileUnit.parentSeries.creatingOrganizationArray.creatingOrganization[0].creator.termName
+			}
+		}
 		var object_list_item = '<div>\
 		<a href="' + url + '"><img data-lazy="' + thumb_url + '"></a>\
 		</div>'

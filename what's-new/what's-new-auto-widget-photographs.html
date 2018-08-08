@@ -72,10 +72,14 @@ $.getJSON(url, function(t) {
 			var object_url = t.opaResponse.results.result[f].objects.object[0].file['@url'];
 			var thumb_url = t.opaResponse.results.result[f].objects.object[0].thumbnail['@url']
 		}
-// 		try {
-		var title = t.opaResponse.results.result[f].description.item.title
-		var creator = t.opaResponse.results.result[f].description.item.parentFileUnit.parentSeries.creatingOrganizationArray.creatingOrganization.creator.termName
-// 		}
+		try {
+			var title = t.opaResponse.results.result[f].description.item.title
+			var creator = t.opaResponse.results.result[f].description.item.parentFileUnit.parentSeries.creatingOrganizationArray.creatingOrganization.creator.termName
+		}
+		catch {
+			var title = t.opaResponse.results.result[f].description.item.title
+			var creator = t.opaResponse.results.result[f].description.item.parentSeries.creatingOrganizationArray.creatingOrganization.creator.termName
+		}
 // 		catch(err) {
 // 		var title = t.opaResponse.results.result[f].description.fileUnit.title
 // 		var creator = t.opaResponse.results.result[f].description.fileUnit.creatingOrganizationArray.creatingOrganization.creator.termName

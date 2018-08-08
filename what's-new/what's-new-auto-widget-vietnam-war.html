@@ -59,7 +59,7 @@
 $(document).ready(function() {
 
 var cursor = '*'
-url = 'https://catalog.archives.gov/api/v1?type=description&description.item.generalRecordsTypeArray.generalRecordsType.naId=10035843&exists=objects.object.thumbnail&resultFields=description,naId,num,objects.object.thumbnail,objects.object.file&sort=naIdSort%20desc&rows=100&cursorMark=' + cursor
+url = 'https://catalog.archives.gov/api/v1?type=description&description.item.topicalSubjectArray.topicalSubject.naId=10643608&exists=objects.object.thumbnail&resultFields=description,naId,num,objects.object.thumbnail,objects.object.file&sort=naIdSort%20desc&rows=100&cursorMark=' + cursor
 $.getJSON(url, function(t) {
 	var object_list = ''
 	for (f = 0; f < t.opaResponse.results.result.length; f++) {
@@ -68,17 +68,38 @@ $.getJSON(url, function(t) {
 			var object_url = t.opaResponse.results.result[f].objects.object.file['@url'];
 			var thumb_url = t.opaResponse.results.result[f].objects.object.thumbnail['@url']
 		}
-		catch {
+		catch(err) {
 			var object_url = t.opaResponse.results.result[f].objects.object[0].file['@url'];
 			var thumb_url = t.opaResponse.results.result[f].objects.object[0].thumbnail['@url']
 		}
+
 		try {
 			var title = t.opaResponse.results.result[f].description.item.title
-			var creator = t.opaResponse.results.result[f].description.item.parentFileUnit.parentSeries.creatingOrganizationArray.creatingOrganization.creator.termName
+			try {
+				try {
+					var creator = t.opaResponse.results.result[f].description.item.parentFileUnit.parentSeries.creatingOrganizationArray.creatingOrganization.creator.termName
+				}
+				catch(err) {
+					var creator = t.opaResponse.results.result[f].description.item.parentFileUnit.parentSeries.creatingOrganizationArray.creatingOrganization[0].creator.termName
+				}
+			}
+			catch(err) {
+				try {
+					var creator = t.opaResponse.results.result[f].description.item.parentSeries.creatingOrganizationArray.creatingOrganization.creator.termName
+				}
+				catch(err) {
+					var creator = t.opaResponse.results.result[f].description.item.parentSeries.creatingOrganizationArray.creatingOrganization[0].creator.termName
+				}
+			}
 		}
-		catch {
-			var title = t.opaResponse.results.result[f].description.item.title
-			var creator = t.opaResponse.results.result[f].description.item.parentSeries.creatingOrganizationArray.creatingOrganization.creator.termName
+		catch(err) {
+			var title = t.opaResponse.results.result[f].description.fileUnit.title
+			try {
+				var creator = t.opaResponse.results.result[f].description.fileUnit.parentSeries.creatingOrganizationArray.creatingOrganization.creator.termName
+			}
+			catch(err) {
+				var creator = t.opaResponse.results.result[f].description.fileUnit.parentSeries.creatingOrganizationArray.creatingOrganization[0].creator.termName
+			}
 		}
 // 		catch(err) {
 // 		var title = t.opaResponse.results.result[f].description.fileUnit.title
@@ -173,7 +194,8 @@ $.getJSON(url, function(t) {
   		adaptiveHeight: true,
   		arrows: false,
   		fade: true,
- 		asNavFor: '.autoplay'
+ 		asNavFor: '.autoplay',
+ 		waitForAnimate: true,
 	  });
       $('.autoplay').slick({
         infinite: true,
@@ -183,7 +205,8 @@ $.getJSON(url, function(t) {
 	    autoplaySpeed: 1000,
   		variableWidth: true,
   		centerMode: true,
- 		asNavFor: '.main'
+ 		asNavFor: '.main',
+ 		waitForAnimate: true
 	  });
     });
 </script>
