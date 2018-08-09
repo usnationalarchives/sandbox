@@ -79,7 +79,7 @@ $(document).ready(function() {
 
 
 	function getresults(offset) {
-		url = 'https://catalog.archives.gov/api/v1?type=description&resultFields=naId,description&sort=naIdSort%20desc&rows=100&offset=' + offset
+		url = 'https://catalog.archives.gov/api/v1?type=description&resultFields=naId,description&sort=naIdSort%20desc&rows=50&offset=' + offset
 		$.getJSON(url, function(t) {
 			output = ''
 			for (f = 0; f < t.opaResponse.results.result.length; f++) {
@@ -114,7 +114,7 @@ $(document).ready(function() {
 				<li>[' + level + '] "<a href="' + url + '">' + title + '</a>"</li>'
 			}
 			
-			$('#counter').html('<p>Showing <strong>' + (offset + 100) + '</strong> records most recently added to the catalog.</p>')
+			$('#counter').html('<p>Showing <strong>' + (offset + 50) + '</strong> records most recently added to the catalog.</p>')
 			$('#output').append(output)
 			$('#more').show()
 			return output;
@@ -126,7 +126,7 @@ $(document).ready(function() {
 $(window).scroll(function() {
 	if($(window).scrollTop() == $(document).height() - $(window).height()) {
 		$('#more').html('<center><img width="50px" src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Lightness_rotate_36f_cw.gif"> Loading more...</center>')
-		offset = offset + 100
+		offset = offset + 50
 		getresults(offset)
 	}
 });
