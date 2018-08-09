@@ -79,20 +79,30 @@ $(document).ready(function() {
 
 
 	function getresults(offset) {
-		url = 'https://catalog.archives.gov/api/v1?type=description&resultFields=naId,description&sort=naIdSort%20desc&rows=50&offset=' + offset
+		url = 'https://catalog.archives.gov/api/v1?type=description&resultTypes=series&resultFields=naId,description&sort=naIdSort%20desc&rows=50&offset=' + offset
 		$.getJSON(url, function(t) {
 			output = ''
+			record_date = ''
 			for (f = 0; f < t.opaResponse.results.result.length; f++) {
 				var naid = t.opaResponse.results.result[f].naId
 				var url = 'https://catalog.archives.gov/id/' + naid.toString()
 				var level = Object.keys(t.opaResponse.results.result[f].description)[0]
 				var title = t.opaResponse.results.result[f].description[level].title
-		//  		var creator = 
-		//  		if (level === 'fileUnit') {
-		//  			var rgno = t.opaResponse.results.result[f].description[level].parentSeries.parentRecordGroup.recordGroupNumber
-		//  			var rgnaid = t.opaResponse.results.result[f].description[level].parentSeries.parentRecordGroup.naId
-		//  			var rgtitle = t.opaResponse.results.result[f].description[level].parentSeries.parentRecordGroup.title
-		// 		}
+				var created = t.opaResponse.results.result[f].description[level].recordHistory.created.dateTime.substring(0,10)
+		 		if (level === 'series') {
+		 			try {
+						var rgno = t.opaResponse.results.result[f].description[level].parentRecordGroup.recordGroupNumber
+						var rgnaid = t.opaResponse.results.result[f].description[level].parentRecordGroup.naId
+						var rgtitle = t.opaResponse.results.result[f].description[level].parentRecordGroup.title
+						var parent = '<a href="https://catalog.archives.gov/id/' + rgnaid  + '"> Record Group ' + rgno + ': "' + rgtitle + '"</a>'
+		 			}
+		 			catch(err) {
+						var collid = t.opaResponse.results.result[f].description[level].parentCollection.collectionIdentifier
+						var collnaid = t.opaResponse.results.result[f].description[level].parentCollection.naId
+						var colltitle = t.opaResponse.results.result[f].description[level].parentCollection.title
+						var parent = '<a href="https://catalog.archives.gov/id/' + collnaid  + '"> Collection ' + collid + ': "' + colltitle + '"</a>'
+		 			}
+				}
 		
 			if (level === 'item') {
 				var level  = 'Item'
@@ -109,12 +119,18 @@ $(document).ready(function() {
 			if (level === 'recordGroup') {
 				var level  = 'Record group'
 			}
-			
-				output = output + '\
-				<li>[' + level + '] "<a href="' + url + '">' + title + '</a>"</li>'
+			if (created !== record_date) {
+				output = output + '</ul>\
+				<p><strong>' + created + '</strong></p>\
+				<ul>'
+				var record_date = created
+				}
+				
+			output = output + '\
+				<li style="margin: 10px">"<strong><a href="' + url + '">' + title + '</a></strong>," from ' + parent + '</li>'
 			}
 			
-			$('#counter').html('<p>Showing <strong>' + (offset + 50) + '</strong> records most recently added to the catalog.</p>')
+			$('#counter').html('<h1>What\'s New in the Catalog</h1><p>This page is an automated feed of the newest series in the National Archives catalog. The dates you see in the headers are the date the catalog record was first created by an archivist. These will generally start a few weeks before today\'s date, because of the time it took that description to be approved and added to the catalog. Continue scrolling to automatically load older records.</p><p>Currently showing <strong>' + (offset + 50) + '</strong> series most recently added to the catalog.')
 			$('#output').append(output)
 			$('#more').show()
 			return output;
@@ -386,7 +402,7 @@ table.sortable-onload-0  tr:nth-of-type(odd) {
       
         <div class="region region-content">
     <section id="block-system-main" class="block block-system clearfix">
-<span id="counter"></span>
+<span id="counter"></span><br/>
 <ul><span id="output"></span></ul><br/>
 <p id="more" style="display:none"></p>
 </section>
