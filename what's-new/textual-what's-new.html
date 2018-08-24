@@ -97,10 +97,15 @@ $(document).ready(function() {
 						var parent = '<a href="https://catalog.archives.gov/id/' + rgnaid  + '"> Record Group ' + rgno + ': "' + rgtitle + '"</a>'
 		 			}
 		 			catch(err) {
-						var collid = t.opaResponse.results.result[f].description[level].parentCollection.collectionIdentifier
-						var collnaid = t.opaResponse.results.result[f].description[level].parentCollection.naId
-						var colltitle = t.opaResponse.results.result[f].description[level].parentCollection.title
-						var parent = '<a href="https://catalog.archives.gov/id/' + collnaid  + '"> Collection ' + collid + ': "' + colltitle + '"</a>'
+						try {
+							var collid = t.opaResponse.results.result[f].description[level].parentCollection.collectionIdentifier
+							var collnaid = t.opaResponse.results.result[f].description[level].parentCollection.naId
+							var colltitle = t.opaResponse.results.result[f].description[level].parentCollection.title
+							var parent = '<a href="https://catalog.archives.gov/id/' + collnaid  + '"> Collection ' + collid + ': "' + colltitle + '"</a>'
+							}
+						catch(err) {
+							var parent = ''
+						}
 		 			}
 				}
 		
