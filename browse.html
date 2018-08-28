@@ -2,12 +2,7 @@
 - archives.gov style
 - separate JS
 - Paging
-- Handle RG/series with 0 results
-- Collections
-- Link to records for final items
-- Add'l metadata?
-- Better navigation links
-- If a file unit has no image, check if it has children?
+- No collection handling yet
 -->
 
 <html>
@@ -31,6 +26,24 @@
 	text-decoration:none;
 	text-shadow:0px 1px 0px #283966;
 }
+.non-button {
+	-moz-box-shadow: 0px 0px 0px 2px #4D5656;
+	-webkit-box-shadow: 0px 0px 0px 2px #4D5656;
+	box-shadow: 0px 0px 0px 2px #4D5656;
+	background-color:#E5E8E8;
+	-moz-border-radius:10px;
+	-webkit-border-radius:10px;
+	border-radius:10px;
+	border:1px solid #424949;
+	display:inline-block;
+	cursor:pointer;
+	color:#000000;
+	font-family:Arial;
+	font-size:16;
+	padding:12px 37px;
+	text-decoration:none;
+	text-shadow:0px 0px 0px #283966;
+}
 .button:hover {
 	background-color:#666666;
 }
@@ -38,6 +51,27 @@
 	position:relative;
 	top:1px;
 }
+.accordion {
+    background-color: #eee;
+    color: #444;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    text-align: left;
+    border: none;
+    outline: none;
+    transition: 0.4s;
+}
+.active, .accordion:hover {
+    background-color: #ccc;
+}
+.panel {
+    padding: 0 18px;
+    background-color: white;
+    display: none;
+    overflow: hidden;
+}
+
 </style>
 </head>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
@@ -45,18 +79,96 @@
 var listseries
 var listfileitem
 var listitem
+var listrg
+
 $(document).ready(function() {
  
-function listrg() {
-url = 'https://catalog.archives.gov/api/v1?resultTypes=recordGroup&rows=10000'
+ 	window.onload = function WindowLoad() {
+	
+	params = window.location.search.substring(1).split("=");
+	
+	if (params[0] == 'id') {
+		parse(params[1]);
+	}
+	else {
+		listrg();
+	}
+	}
+
+load = function() {
+$('#listrecords').html('<center><img width="300px" src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Lightness_rotate_36f_cw.gif"> <h1>Loading time: <span id="seconds"></span> seconds.</h1></center>')
+
+window.setInterval((function(){
+   var start = Date.now();
+   var textNode = document.createTextNode('0');
+   document.getElementById('seconds').appendChild(textNode);
+   return function() {
+        textNode.data = Math.floor((Date.now()-start).toFixed(3))/1000;
+        };
+   }()), 1);
+}
+
+parse = function(naid) {
+	load();
+	url = 'https://catalog.archives.gov/api/v1?resultFields=description&naIds=' + naid
+	$.getJSON(url, function(t) {
+		level = Object.keys(t.opaResponse.results.result[0].description)[0]
+		if (level === 'recordGroup') {
+			RGnaid = t.opaResponse.results.result[0].description.recordGroup.naId
+			RG = t.opaResponse.results.result[0].description.recordGroup.recordGroupNumber
+			RGtitle = t.opaResponse.results.result[0].description.recordGroup.title
+			listseries(RGnaid, RG, RGtitle)
+		}
+		if (level === 'series') {
+		
+		}
+	});
+}
+
+
+up = function(naid) {
+	load();
+	url = 'https://catalog.archives.gov/api/v1?resultFields=description&naIds=' + naid
+	$.getJSON(url, function(t) {
+		level = Object.keys(t.opaResponse.results.result[0].description)[0]
+		if ((level === 'recordGroup') || (level === 'recordGroup')) {
+			listrg()
+		}
+		if (level === 'series') {
+			RGnaid = t.opaResponse.results.result[0].description.series.parentRecordGroup.naId
+			RG = t.opaResponse.results.result[0].description.series.parentRecordGroup.recordGroupNumber
+			RGtitle = t.opaResponse.results.result[0].description.series.parentRecordGroup.title
+			listseries(RGnaid, RG, RGtitle)
+		}
+		if (level === 'fileUnit') {
+			seriesnaid = t.opaResponse.results.result[0].description.fileUnit.parentSeries.naId
+			seriesname = t.opaResponse.results.result[0].description.fileUnit.parentSeries.title
+			
+			seriesdate = ' (' + t.opaResponse.results.result[0].description.fileUnit.parentSeries.inclusiveDates.inclusiveStartDate.year + '&ndash;' + t.opaResponse.results.result[0].description.fileUnit.parentSeries.inclusiveDates.inclusiveEndDate.year + ')'
+			listfileitem(seriesnaid, seriesname, seriesdate)
+		}
+	});
+}
+
+listrg = function() {
+
+load();
+
+url = 'https://catalog.archives.gov/api/v1?resultTypes=recordGroup&resultFields=naId,description.recordGroup.seriesCount,description.recordGroup.title,description.recordGroup.recordGroupNumber&rows=1000'
 $.getJSON(url, function(t) {
 
 titles = []
 
-for (f = 0; f < t.opaResponse.results.total; f++) {
+for (f = 0; f < t.opaResponse.results.result.length; f++) {
 	naid = t.opaResponse.results.result[f].naId
+	series_count = t.opaResponse.results.result[f].description.recordGroup.seriesCount
 	RG = t.opaResponse.results.result[f].description.recordGroup.recordGroupNumber
+	if (series_count > 0) {
 	titles.push({title: '<button class="button" href="#" onclick="listseries(\'' + naid + '\', \'' + RG + '\', \'' + t.opaResponse.results.result[f].description.recordGroup.title + '\');">+ ' + 'Record Group ' + RG + ': ' + t.opaResponse.results.result[f].description.recordGroup.title + '</button><br/>', RG: RG})
+	}
+	else {
+	titles.push({title: '<button class="non-button" onclick="window.open(\'https://catalog.archives.gov/id/' + naid + '\', \'_blank\')" href="https://catalog.archives.gov/id/' + naid + '" >&ndash; &nbsp;Record Group ' + RG + ': ' + t.opaResponse.results.result[f].description.recordGroup.title + '</button><br/>', RG: RG})
+	}
 	}
 	
 	titles.sort(function(a, b){
@@ -68,67 +180,142 @@ for (f = 0; f < t.opaResponse.results.total; f++) {
 		sortedtitles.push(titles[w].title)
 	};
 	
-$('#listrg').html('<h2>Now viewing: All Record Groups</h2><h3>' + t.opaResponse.results.total + ' record groups:</h3>' + sortedtitles.join('<br/>'));
+$('#listrecords').html('<h2>Now viewing: All Record Groups</h2><h3>' + t.opaResponse.results.total + ' record groups:</h3>' + sortedtitles.join('<br/>'));
 
 });
 
 }
 
 listseries = function(RGnaid, RG, RGtitle) {
-url = 'https://catalog.archives.gov/OpaAPI/iapi/v1?action=search&f.parentNaId=' + RGnaid + '&q=*:*&rows=10000&sort=title desc'
-$.getJSON(url, function(t) {
+load();
+url = 'https://catalog.archives.gov/api/v1?description.series.parentRecordGroup.recordGroupNumber=' + RG + '&resultFields=naId,description.series.title,description.series.fileUnitCount,description.series.itemCount,description.series.itemAvCount,description.series.inclusiveDates&rows=1000&sort=titleSort asc'
+$.getJSON(url, function(j) {
 
-titles = ''
+titles = '';
 
-for (f = 0; f < t.opaResponse.results['@total']; f++) {
-	naid = t.opaResponse.results.result[f].naId
-	name = t.opaResponse.results.result[f].briefResults.titleLine[0].value.replace(/\"/g, '&#x22;')
-	date = t.opaResponse.results.result[f].briefResults.titleLine[1].value
-	
-	titles = titles + '<button class="button" href="#" onclick="listfileitem(\'' + naid + '\', \'' + name + '\', \'' + date + '\');">+ ' + name + ' (' + date + ')</button><br/><br/>'
-	}
-	
-$('#listrg').html('<h2>Now viewing: Record Group ' + RG + ': <a href=\"http://catalog.archives.gov/id/' + RGnaid + '\">' + RGtitle + '</a></h2><h3>' + t.opaResponse.results['@total'] + ' series:</h3>' + titles);
+	for(f = 0; f < j.opaResponse.results.total; f++) {
+		
+		file_units = Number(j.opaResponse.results.result[f].description.series.fileUnitCount)
+		items = Number(j.opaResponse.results.result[f].description.series.itemCount) + Number(j.opaResponse.results.result[f].description.series.itemAvCount)
+		naid = j.opaResponse.results.result[f].naId
+		name = j.opaResponse.results.result[f].description.series.title
+		date = ' (' + j.opaResponse.results.result[f].description.series.inclusiveDates.inclusiveStartDate.year + '&ndash;' + j.opaResponse.results.result[f].description.series.inclusiveDates.inclusiveEndDate.year + ')'
+
+		if ((file_units + items) > 0) {
+		titles = titles + '<button class="button" href="#" onclick="listfileitem(\'' + naid + '\', \'' + name + '\', \'' + date + '\');">+ ' + name + date + '</button><br/><br/>'
+		}
+		else {
+		titles = titles + '<button class="non-button" onclick="window.open(\'https://catalog.archives.gov/id/' + naid + '\', \'_blank\')" href="https://catalog.archives.gov/id/' + naid + '" >&ndash; &nbsp;' + name + date + '</button><br/><br/>'
+		}
+		}
+
+$('#listrecords').html('<h2>Now viewing: <button class="button" href="#" onclick="up(' + RGnaid + ')">^ Record Group ' + RG + ': ' + RGtitle + '</button></h2><h3>' + j.opaResponse.results['total'] + ' series:</h3><h3>File units</h3>' + titles);
 
 });
 
 }
 
 listfileitem = function(seriesnaid, seriesname, seriesdate) {
-url = 'https://catalog.archives.gov/OpaAPI/iapi/v1?action=search&f.parentNaId=' + seriesnaid + '&q=*:*&rows=10000&sort=title desc'
-$.getJSON(url, function(t) {
+load();
+
+// <button class="accordion">Section 1</button>
+// <div class="panel">
+//   <p>Lorem ipsum...</p>
+// </div>
 
 titles = ''
-try {
-for (f = 0; f < t.opaResponse.results['@total']; f++) {
-	naid = t.opaResponse.results.result[f].naId
-	name = t.opaResponse.results.result[f].briefResults.titleLine[0].value.replace(/\"/g, '&#x22;')
-	if (t.opaResponse.results.result[f].thumbnailFile !== '') {
-		thumbnail = 'https://catalog.archives.gov/OpaAPI/media/' + naid + '/' + t.opaResponse.results.result[f].thumbnailFile
-	}
-	else {
-		thumbnail = ''
-		}
-	titles = titles + '<tr><td style="border-right:solid 2px; text-align:right"><img src="' + thumbnail + '"/></td><td style="border-bottom:solid 1px" valign="top"><button class="button" href="#" onclick="listitem(\'' + naid + '\', \'' + name + '\', \'' + date + '\');">+ \"' + name + '\"</button></tr>'
-	}
-	
-$('#listrg').html('<h2>Now viewing: Series "<a href=\"http://catalog.archives.gov/id/' + seriesnaid + '\">' + seriesname + '</a>" (' + seriesdate + ')</h2><h3>' + t.opaResponse.results['@total'] + ' records:</h3><table>' + titles + '</table>');
+totals=''
 
+url = 'https://catalog.archives.gov/api/v1?type=description&description.fileUnit.parentSeries.naId=' + seriesnaid + '&resultFields=naId,description.fileUnit.title,description.fileUnit.itemCount,description.fileUnit.itemAvCount&rows=1000&sort=titleSort asc'
+$.getJSON(url, function(j) {
+	totals = Number(totals) + Number(j.opaResponse.results.total);
+
+	for(f = 0; f < j.opaResponse.results.total; f++) {
+		try {
+			items = Number(j.opaResponse.results.result[f].description.fileUnit.itemCount) + Number(j.opaResponse.results.result[f].description.fileUnit.itemAvCount)
+		} catch (err){
+			items = 0;
+			}
+		naid = j.opaResponse.results.result[f].naId
+		name = j.opaResponse.results.result[f].description.fileUnit.title
+		
+		if (items > 0) {
+		titles = titles + '<button class="button" href="#" onclick="listitem(\'' + naid + '\', \'' + name + '\');">+ ' + name + '</button><br/><br/>'
+		}
+		else {
+		titles = titles + '<button class="non-button" onclick="window.open(\'https://catalog.archives.gov/id/' + naid + '\', \'_blank\')" href="https://catalog.archives.gov/id/' + naid + '" >&ndash; &nbsp;' + name + '</button><br/><br/>'
+		}
+		}
+
+url = 'https://catalog.archives.gov/api/v1?type=description&description.item.parentSeries.naId=' + seriesnaid + '&resultFields=naId,description.item.title&rows=1000&sort=titleSort asc'
+$.getJSON(url, function(j) {
+	totals = Number(totals) + Number(j.opaResponse.results.total);
+
+	for(f = 0; f < j.opaResponse.results.total; f++) {
+		naid = j.opaResponse.results.result[f].naId
+		name = j.opaResponse.results.result[f].description.item.title
+		
+		titles = titles + '<button class="non-button" onclick="window.open(\'https://catalog.archives.gov/id/' + naid + '\', \'_blank\')" href="https://catalog.archives.gov/id/' + naid + '" >&ndash; &nbsp;' + name + '</button><br/><br/>'
+		}
+
+url = 'https://catalog.archives.gov/api/v1?type=description&description.itemAv.parentSeries.naId=' + seriesnaid + '&resultFields=naId,description.itemAv.title&rows=1000&sort=titleSort asc'
+$.getJSON(url, function(j) {
+	totals = Number(totals) + Number(j.opaResponse.results.total);
+
+	for(f = 0; f < j.opaResponse.results.total; f++) {
+		naid = j.opaResponse.results.result[f].naId
+		name = j.opaResponse.results.result[f].description.itemAv.title
+		
+		titles = titles + '<button class="non-button" onclick="window.open(\'https://catalog.archives.gov/id/' + naid + '\', \'_blank\')" href="https://catalog.archives.gov/id/' + naid + '" >&ndash; &nbsp;' + name + '</button><br/><br/>'
+		}
+
+	
+$('#listrecords').html('<h2>Now viewing: <button class="button" href="#" onclick="up(' + seriesnaid + ')">^ Series "' + seriesname + '"' + seriesdate + '</h2><h3>' + totals + ' items and/or file units:</h3><table>' + titles + '</table>');
+	});
+	});
+		});
 }
-catch(err) {
-$('#listrg').html()
+
+listitem = function(filenaid, filename) {
+load();
+// <button class="accordion">Section 1</button>
+// <div class="panel">
+//   <p>Lorem ipsum...</p>
+// </div>
+
+titles = ''
+totals=''
+
+url = 'https://catalog.archives.gov/api/v1?type=description&description.item.parentFileUnit.naId=' + filenaid + '&resultFields=naId,description.item.title&rows=1000&sort=titleSort asc'
+$.getJSON(url, function(j) {
+	totals = Number(totals) + Number(j.opaResponse.results.total);
+
+	for(f = 0; f < j.opaResponse.results.total; f++) {
+		naid = j.opaResponse.results.result[f].naId
+		name = j.opaResponse.results.result[f].description.item.title
+		titles = titles + '<button class="non-button" onclick="window.open(\'https://catalog.archives.gov/id/' + naid + '\', \'_blank\')" href="https://catalog.archives.gov/id/' + naid + '" >&ndash; &nbsp;' + name + '</button><br/><br/>'
+		}
+
+url = 'https://catalog.archives.gov/api/v1?type=description&description.itemAv.parentFileUnit.naId=' + filenaid + '&resultFields=naId,description.itemAv.title&rows=1000&sort=titleSort asc'
+$.getJSON(url, function(j) {
+	totals = Number(totals) + Number(j.opaResponse.results.total);
+
+	for(f = 0; f < j.opaResponse.results.total; f++) {
+		naid = j.opaResponse.results.result[f].naId
+		name = j.opaResponse.results.result[f].description.item.title
+		
+		titles = titles + '<button class="non-button" onclick="window.open(\'https://catalog.archives.gov/id/' + naid + '\', \'_blank\')" href="https://catalog.archives.gov/id/' + naid + '" >&ndash; &nbsp;' + name + '</button><br/><br/>'
+		}
+	
+$('#listrecords').html('<h2>Now viewing: <button class="button" href="#" onclick="up(' + filenaid + ')">^ File unit "' + filename + '"</h2><h3>' + totals + ' items:</h3><table>' + titles + '</table>');
+	});
+		});
 }
+
 });
 
-}
-
-
-listrg()
-
-})
 </script>
-
-<span id="listrg"/>
+<span id="listrecords"/>
 
 </body>
 </html>
