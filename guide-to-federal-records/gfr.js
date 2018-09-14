@@ -119,52 +119,40 @@ $(document).ready(function() {
 
 // Currently, we first query the internal API for all the series in an RG/Collection, and then we make an array of all the series' NAIDs to pass as a query to the public API. We have to do this because (1) the public API fields for parentRecordGroup and parentCollection are not searchable, but (2) the internal API doesn't give us all the data we need. So we use the internal API to get the list of NAIDs, and then query them explicitly instead of querying by parent description. In the future, we'll search "https://catalog.archives.gov/api/v1?rows=10000&description.series.parentRecordGroup.recordGroupNumber="
 
-		$.getJSON('https://catalog.archives.gov/OpaAPI/iapi/v1?action=search&f.level=series&f.parentNaId=' + naid + '&q=*:*&rows=10000', function(f){
-		series_naids = []
-		for (n = 0; n < f.opaResponse.results.result.length; n++) {
-			series_naids.push(f.opaResponse.results.result[n].naId);
-		}
-		$.getJSON('https://catalog.archives.gov/api/v1?sort=titleSort asc&rows=10000', {'naIds': series_naids.slice(0,750).toString() }, function(s){
+
+$.getJSON('https://catalog.archives.gov/api/v1?resultFields=num,naId,description.series.creatingIndividualArray,description.series.creatingOrganizationArray,description.series.physicalOccurrenceArray,description.series.inclusiveDates,description.series.fileUnitCount,description.series.itemCount,description.series.itemAvCount,description.series.title&sort=titleSort asc&rows=100&description.series.parent' + APItype.replace(/^\w/, c => c.toUpperCase()) + '.naId=' + naid, function(s){
 		
-		creator_naids = [];
-		creator_names = [];
-		result_titles = [];
-		result_naids = [];
-		result_startyears = [];
-		result_endyears = [];
-		result_extents = [];
-		result_items = [];
-		result_fileunits = [];
-		result_referenceunits =[]
+
+		rows = ''
 		for (n = 0; n < s.opaResponse.results.result.length; n++) {
 			
 			try {
 				try {
-					creator_naids.push(s.opaResponse.results.result[n].description.series.creatingOrganizationArray.creatingOrganization.creator.naId);
-					creator_names.push(s.opaResponse.results.result[n].description.series.creatingOrganizationArray.creatingOrganization.creator.termName);
+					creator_naid = s.opaResponse.results.result[n].description.series.creatingOrganizationArray.creatingOrganization.creator.naId;
+					creator_name = s.opaResponse.results.result[n].description.series.creatingOrganizationArray.creatingOrganization.creator.termName;
 				}
 				catch (err) {
-					creator_naids.push(s.opaResponse.results.result[n].description.series.creatingOrganizationArray.creatingOrganization[0].creator.naId);
-					creator_names.push(s.opaResponse.results.result[n].description.series.creatingOrganizationArray.creatingOrganization[0].creator.termName);
+					creator_naid = s.opaResponse.results.result[n].description.series.creatingOrganizationArray.creatingOrganization[0].creator.naId;
+					creator_name = s.opaResponse.results.result[n].description.series.creatingOrganizationArray.creatingOrganization[0].creator.termName;
 				}
 			}
 			catch(err) {
 				try {
-					creator_naids.push(s.opaResponse.results.result[n].description.series.creatingIndividualArray.creatingIndividual.creator.naId);
-					creator_names.push(s.opaResponse.results.result[n].description.series.creatingIndividualArray.creatingIndividual.creator.termName);
+					creator_naid = s.opaResponse.results.result[n].description.series.creatingIndividualArray.creatingIndividual.creator.naId;
+					creator_name = s.opaResponse.results.result[n].description.series.creatingIndividualArray.creatingIndividual.creator.termName;
 				}
 				catch (err) {
-					creator_naids.push(s.opaResponse.results.result[n].description.series.creatingIndividualArray.creatingIndividual[0].creator.naId);
-					creator_names.push(s.opaResponse.results.result[n].description.series.creatingIndividualArray.creatingIndividual[0].creator.termName);
+					creator_naid = s.opaResponse.results.result[n].description.series.creatingIndividualArray.creatingIndividual[0].creator.naId;
+					creator_name = s.opaResponse.results.result[n].description.series.creatingIndividualArray.creatingIndividual[0].creator.termName
 				}
 			}
-			result_titles.push(s.opaResponse.results.result[n].description.series.title);
-			result_naids.push(s.opaResponse.results.result[n].description.series.naId);
-			result_startyears.push(s.opaResponse.results.result[n].description.series.inclusiveDates.inclusiveStartDate.year);
-			result_endyears.push(s.opaResponse.results.result[n].description.series.inclusiveDates.inclusiveEndDate.year);
+			result_title = s.opaResponse.results.result[n].description.series.title;
+			result_naid = s.opaResponse.results.result[n].naId;
+			result_startyear = s.opaResponse.results.result[n].description.series.inclusiveDates.inclusiveStartDate.year;
+			result_endyear = s.opaResponse.results.result[n].description.series.inclusiveDates.inclusiveEndDate.year;
 			try {
-				result_extents.push(s.opaResponse.results.result[n].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence.extent);
-				result_referenceunits.push(s.opaResponse.results.result[n].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence.referenceUnitArray.referenceUnit.name);
+				result_extent = s.opaResponse.results.result[n].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence.extent;
+				result_referenceunit = s.opaResponse.results.result[n].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence.referenceUnitArray.referenceUnit.name;
 			}
 			catch(err) {
 				multiextent = '';
@@ -177,44 +165,30 @@ $(document).ready(function() {
 					multireferenceunit = multireferenceunit + s.opaResponse.results.result[n].description.series.physicalOccurrenceArray.seriesPhysicalOccurrence[l].referenceUnitArray.referenceUnit.name + '<br/>'
 				}
 				}
-				result_extents.push(multiextent);
-				result_referenceunits.push(multireferenceunit)
+				result_extent = multiextent;
+				result_referenceunit = multireferenceunit
 			}
-			result_fileunits.push(s.opaResponse.results.result[n].description.series.fileUnitCount);
-			result_items.push(Number(s.opaResponse.results.result[n].description.series.itemCount) + Number(s.opaResponse.results.result[n].description.series.itemAvCount))
+			result_fileunits = s.opaResponse.results.result[n].description.series.fileUnitCount;
+			result_items = Number(s.opaResponse.results.result[n].description.series.itemCount) + Number(s.opaResponse.results.result[n].description.series.itemAvCount)
+			
+			rows = rows + '\
+			<tr style="border: 0;" valign="top"><td><strong><a href="https://catalog.archives.gov/id/' + result_naid + '">' + result_title + '</strong></a><br/>&nbsp;&nbsp;&nbsp;&nbsp; <small>Creator: <a href="https://catalog.archives.gov/id/' + creator_naid + '">' + creator_name + '</a></small></td><td>' + result_startyear + ' – ' + result_endyear + '</td><td>' + result_extent + '</td><td>' + result_referenceunit + '</td><td>' + result_fileunits + '</td><td>' + result_items + '</td></tr>\
+			'
+			
 		}
-		var creator_naid_list = creator_naids.filter(function(elem, pos) {
-			return creator_naids.indexOf(elem) == pos;
-		});
-		var creator_name_list = creator_names.filter(function(elem, pos) {
-			return creator_names.indexOf(elem) == pos;
-		});
-		sections = []
-		for (i = 0; i < creator_naid_list.length; i++) {
-		rows = ''
-			for (y = 0; y < creator_naids.length; y++) {
-				if (creator_naids[y] == creator_naid_list[i]) {
-				rows = rows + '<tr><td><strong><a href="https://catalog.archives.gov/id/' + result_naids[y] + '">' + result_titles[y] + '</strong></a><br/>&nbsp;&nbsp;&nbsp;&nbsp; (NAID: ' + result_naids[y] + ')</td><td>' + result_startyears[y] + ' – ' + result_endyears[y] + '</td><td>' + result_extents[y] + '</td><td>' + result_referenceunits[y] + '</td><td>' + result_fileunits[y] + '</td><td>' + result_items[y] + '</td></tr>'
-				}
-			}
-		
-		sections.push({title: creator_name_list[i], section: '<h3><a href="https://catalog.archives.gov/id/' + creator_naid_list[i] + '">' + creator_name_list[i] + '</a></h3><br/><table width="100%" border="1"><tr><th width="40%" rowspan="2"><center>Series (National Archives Identifier)</center></th><th rowspan="2" width="12%"><center>Date range</center></th><th width="17%" rowspan="2"><center>Extent</center></th><th width="21%" rowspan="2"><center>Location</center></th><th colspan="2"><center>Records</center></th></tr><tr><th width="5%"><center>File units</center></th><th width="5%"><center>Items</center></th></tr>' + rows + '</table>'})
-		}
-
-		sections.sort(function(a, b){
-			if(a.title < b.title) return -1;
-			if(a.title > b.title) return 1;
-			return 0;
-			});
-		sortedsections = [];
-		for (w = 0; w < sections.length; w++) {
-			sortedsections.push(sections[w].section)
-		};
-		$('#records').html('<h2>Records</h2>' + sortedsections.join('<br/>'))
-		});
+		$('#table').html('<h2>Records</h2>' + '<table width="100%" border="1"><tr><th width="40%" rowspan="2"><center>Series (National Archives Identifier)</center></th><th rowspan="2" width="12%"><center>Date range</center></th><th width="17%" rowspan="2"><center>Extent</center></th><th width="21%" rowspan="2"><center>Location</center></th><th colspan="2"><center>Records</center></th></tr><tr><th width="5%"><center>File units&nbsp; &nbsp;</center></th><th width="5%"><center>&nbsp; &nbsp;Items&nbsp; &nbsp;</center></th></tr>' + rows)
+		$('#bottom').html('</table>')
 		});
 	});
 	}
+	
+// $(window).scroll(function() {
+// 	if($(window).scrollTop() == $(document).height() - $(window).height()) {
+// 		$('#more').html('<center><img width="50px" src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Lightness_rotate_36f_cw.gif"> Loading more...</center>')
+// 		offset = offset + 50
+// 		getresults(offset)
+// 	}
+// });
 
 
 	$("#RGinput").click(function(event){
