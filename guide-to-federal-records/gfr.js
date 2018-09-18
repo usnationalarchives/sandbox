@@ -190,7 +190,7 @@ $.getJSON('https://catalog.archives.gov/api/v1?resultFields=num,naId,description
 			last = 199;
 			}
 		else {
-			last = Math.floor(series_count / 50);
+			last = Math.ceil(series_count / 50);
 			if (last == (series_count/50)) {
 				last = last - 1;
 			}
