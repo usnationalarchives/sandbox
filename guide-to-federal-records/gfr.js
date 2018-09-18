@@ -3,13 +3,20 @@ $(document).ready(function() {
 	window.onload = function WindowLoad() {
 	
 	
-	params = window.location.search.substring(1).split("=");
+	params = window.location.search.substring(1).split("&");
 	
-	if ((params[0] == 'RG') || (params[0] == 'collection')) {
-		loadresults(params)
+	if ((params[0].split("=")[0] == 'RG') || (params[0].split("=")[0] == 'collection')) {
+		id = params[0].split("=")
+		try {
+			offset = (params[1].split("=")[1] - 1) * 50
+			}
+		catch(err) {
+			offset = 0
+			}
+		loadresults(id, offset)
 		}
-	else if (params[0] == 'keyword') {
-		keyword(params[1])
+	else if (params[0].split("=")[0] == 'keyword') {
+		keyword(params[0].split("=")[1])
 	}
 	else {
 		$('#hide').show();
@@ -78,8 +85,8 @@ $(document).ready(function() {
 		});
 	}
 	
-	function loadresults(params) {
-	
+	function loadresults(params, offset) {
+	load();
 	if (params[0] == 'RG') {
 		var url = 'https://catalog.archives.gov/api/v1?description.recordGroup.recordGroupNumber=' + params[1];
 		type = 'Record Group';
@@ -119,8 +126,7 @@ $(document).ready(function() {
 
 // Currently, we first query the internal API for all the series in an RG/Collection, and then we make an array of all the series' NAIDs to pass as a query to the public API. We have to do this because (1) the public API fields for parentRecordGroup and parentCollection are not searchable, but (2) the internal API doesn't give us all the data we need. So we use the internal API to get the list of NAIDs, and then query them explicitly instead of querying by parent description. In the future, we'll search "https://catalog.archives.gov/api/v1?rows=10000&description.series.parentRecordGroup.recordGroupNumber="
 
-
-$.getJSON('https://catalog.archives.gov/api/v1?resultFields=num,naId,description.series.creatingIndividualArray,description.series.creatingOrganizationArray,description.series.physicalOccurrenceArray,description.series.inclusiveDates,description.series.fileUnitCount,description.series.itemCount,description.series.itemAvCount,description.series.title&sort=titleSort asc&rows=100&description.series.parent' + APItype.replace(/^\w/, c => c.toUpperCase()) + '.naId=' + naid, function(s){
+$.getJSON('https://catalog.archives.gov/api/v1?resultFields=num,naId,description.series.creatingIndividualArray,description.series.creatingOrganizationArray,description.series.physicalOccurrenceArray,description.series.inclusiveDates,description.series.fileUnitCount,description.series.itemCount,description.series.itemAvCount,description.series.title&sort=titleSort asc&rows=50&description.series.parent' + APItype.replace(/^\w/, c => c.toUpperCase()) + '.naId=' + naid + '&offset=' + offset, function(s){
 		
 
 		rows = ''
@@ -172,24 +178,108 @@ $.getJSON('https://catalog.archives.gov/api/v1?resultFields=num,naId,description
 			result_items = Number(s.opaResponse.results.result[n].description.series.itemCount) + Number(s.opaResponse.results.result[n].description.series.itemAvCount)
 			
 			rows = rows + '\
-			<tr style="border: 0;" valign="top"><td><strong><a href="https://catalog.archives.gov/id/' + result_naid + '">' + result_title + '</strong></a><br/>&nbsp;&nbsp;&nbsp;&nbsp; <small>Creator: <a href="https://catalog.archives.gov/id/' + creator_naid + '">' + creator_name + '</a></small></td><td>' + result_startyear + ' – ' + result_endyear + '</td><td>' + result_extent + '</td><td>' + result_referenceunit + '</td><td>' + result_fileunits + '</td><td>' + result_items + '</td></tr>\
+			<tr style="border: 0;" valign="top"><td><strong><a href="https://catalog.archives.gov/id/' + result_naid + '">' + result_title + ' (NAID ' + result_naid + ')</strong></a><br/>&nbsp;&nbsp;&nbsp;&nbsp; <small>Creator: <a href="https://catalog.archives.gov/id/' + creator_naid + '">' + creator_name + '</a></small></td><td>' + result_startyear + ' – ' + result_endyear + '</td><td>' + result_extent + '</td><td>' + result_referenceunit + '</td><td>' + result_fileunits + '</td><td>' + result_items + '</td></tr>\
 			'
 			
 		}
-		$('#table').html('<h2>Records</h2>' + '<table width="100%" border="1"><tr><th width="40%" rowspan="2"><center>Series (National Archives Identifier)</center></th><th rowspan="2" width="12%"><center>Date range</center></th><th width="17%" rowspan="2"><center>Extent</center></th><th width="21%" rowspan="2"><center>Location</center></th><th colspan="2"><center>Records</center></th></tr><tr><th width="5%"><center>File units&nbsp; &nbsp;</center></th><th width="5%"><center>&nbsp; &nbsp;Items&nbsp; &nbsp;</center></th></tr>' + rows)
-		$('#bottom').html('</table>')
+		$('#table').html('<table width="100%" border="1"><tr><th width="40%" rowspan="2"><center>Series (National Archives Identifier)</center></th><th rowspan="2" width="12%"><center>Date range</center></th><th width="17%" rowspan="2"><center>Extent</center></th><th width="21%" rowspan="2"><center>Location</center></th><th colspan="2"><center>Records</center></th></tr><tr><th width="5%"><center>File units&nbsp; &nbsp;</center></th><th width="5%"><center>&nbsp; &nbsp;Items&nbsp; &nbsp;</center></th></tr>' + rows)
+		
+		page = (offset / 50) + 1
+	if (series_count > 50) {
+		if (series_count > 10000) {
+			last = 199;
+			}
+		else {
+			last = Math.floor(series_count / 50);
+			if (last == (series_count/50)) {
+				last = last - 1;
+			}
+		}
+		pages = '';
+		if (page <= 5) {
+			for (q = 1; (q <= last) && (q < 10); q++) {
+				if (q == page) {
+					pages = pages + '\
+					<li class="active"><span>' + q + '</span></li>'
+				}
+				else {
+					pages = pages + '\
+<li><a title="Go to page ' + q + '" href="./?' + params.join("=") + '&page=' + q + '">' + q + '</a></li>'
+				}
+			}
+			if (page < (last-8)) {
+				pages = pages + '\
+<li class="pager-ellipsis disabled"><span>…</span></li>'
+				}
+		}
+		if ((page >= 6) && (page < (last-8))) {
+			pages = pages + '\
+<li class="pager-ellipsis disabled"><span>…</span></li>'
+			for (q = (page-4); (q <= last) && (q <= (page+4)); q++) {
+				if (q == page) {
+					pages = pages + '\
+					<li class="active"><span>' + q + '</span></li>'
+				}
+				else {
+					pages = pages + '\
+<li><a title="Go to page ' + q + '" href="./?' + params.join("=") + '&page=' + q + '">' + q + '</a></li>'
+				}
+			}
+			pages = pages + '\
+<li class="pager-ellipsis disabled"><span>…</span></li>'
+		}
+		if ((page >= 6) && (page > (last-8))) {
+			pages = pages + '\
+<li class="pager-ellipsis disabled"><span>…</span></li>'
+			for (q = (page-(8-(last-page))); q <= last; q++) {
+				if (q == page) {
+					pages = pages + '\
+					<li class="active"><span>' + q + '</span></li>'
+				}
+				else {
+					pages = pages + '\
+<li><a title="Go to page ' + q + '" href="./?' + params.join("=") + '&page=' + q + '">' + q + '</a></li>'
+				}
+			}
+		}
+		firstprev = '';
+		if (page != 1) {
+			firstprev = '\
+<li class="first"><a href="./?' + params.join("=") + '&page=1">first</a></li>\
+<li class="next"><a href="./?' + params.join("=") + '&page=' + (page-1) + '">previous</a></li>'
+		}
+		nextlast = ''
+		if (page != last) {
+			nextlast = '\
+<li class="next"><a href="./?' + params.join("=") + '&page=' + (page+1) + '">next</a></li>\
+<li class="pager-last"><a href="./?' + params.join("=") + '&page=' + last + '">last</a></li>'
+		}
+		$('#toppagination').html('<h2>Records</h2>\
+		<div class="dynamic-widget"><div class="toppagination"><div class="text-center"><br/><ul class="pagination">' + firstprev + pages + nextlast + '\
+</ul></div></div></div>')
+		$('#bottompagination').html('</table>\
+		<div class="dynamic-widget"><div class="toppagination"><div class="text-center"><br/><ul class="pagination">' + firstprev + pages + nextlast + '\
+</ul></div></div></div>')
+	}
+	else {
+	$('#toppagination').html('<h2>Records</h2>')
+		$('#bottompagination').html('</table>')
+	}
 		});
 	});
 	}
-	
-// $(window).scroll(function() {
-// 	if($(window).scrollTop() == $(document).height() - $(window).height()) {
-// 		$('#more').html('<center><img width="50px" src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Lightness_rotate_36f_cw.gif"> Loading more...</center>')
-// 		offset = offset + 50
-// 		getresults(offset)
-// 	}
-// });
-
+load = function() {
+$('#table').html('<center><img width="300px" src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Lightness_rotate_36f_cw.gif"> <h1>Loading time: <span id="seconds"></span> seconds.</h1></center>')
+$('html, body').animate({ scrollTop: 0 }, 'medium');
+window.setInterval((function(){
+   var start = Date.now();
+   var textNode = document.createTextNode('0');
+   document.getElementById('seconds').appendChild(textNode);
+   return function() {
+        textNode.data = Math.floor((Date.now()-start).toFixed(3))/1000;
+        };
+   }()), 1);
+}
 
 	$("#RGinput").click(function(event){
 		RG = $('#RG').val();
