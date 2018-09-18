@@ -187,7 +187,7 @@ $.getJSON('https://catalog.archives.gov/api/v1?resultFields=num,naId,description
 		page = (offset / 50) + 1
 	if (series_count > 50) {
 		if (series_count > 10000) {
-			last = 199;
+			last = 200;
 			}
 		else {
 			last = Math.ceil(series_count / 50);
