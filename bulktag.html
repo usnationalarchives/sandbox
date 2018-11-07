@@ -1,0 +1,120 @@
+<html>
+<title>Automated Tag Assistant</title>
+<head>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script type="text/javascript" language="javascript">
+
+$(document).ready(function() {
+
+// Allow users to use 'enter' key on search box.
+	
+	$('#user').keypress(function(enter){
+		if(enter.keyCode==13)
+		$('#login').click();
+		});
+	$('#pass').keypress(function(enter){
+		if(enter.keyCode==13)
+		$('#login').click();
+		});
+	$('#login').keypress(function(enter){
+		if(enter.keyCode==13)
+		$('#login').click();
+		});
+
+	function login(user, pass) {
+		var url = 'https://catalog.archives.gov/api/v1/login?user=' + user + '&password=' + pass
+		$.ajax({
+  			type: 'POST',
+  			url: url,
+  			success: function(t) {
+				$("#loggedin").html('<h2>Hello, ' + t.opaResponse.user.fullName + '. How can I help?</h2>');
+				$("#bulktag").show();
+				token = t.opaResponse.credentials
+			},
+  			error: function(f, textStatus, error){
+      			$("#loggedin").html('<p>' + JSON.stringify(JSON.parse(JSON.parse(JSON.stringify(f)).responseText).opaResponse.error.description) + '</p>');
+  			},
+  			dataType: "json"
+});
+		post = function(url) {
+		$.ajax({
+  			type: 'POST',
+  			url: url,
+  			beforeSend: function(request) {
+    request.setRequestHeader("Authorization", token);
+  },
+  			success: function(t) {
+  				taggednaid = t.opaResponse.header.request.naId
+				$("#progress").append('<p> NAID <a href="https://catalog.archives.gov/id/' + taggednaid + '">' + taggednaid + '</a>: Added tag "' + tag + '"!</p>');
+			},
+  			error: function(f, textStatus, error){
+  				taggednaid = JSON.stringify(JSON.parse(JSON.parse(JSON.stringify(f)).responseText).opaResponse.error.naId)
+  				description = JSON.stringify(JSON.parse(JSON.parse(JSON.stringify(f)).responseText).opaResponse.error.description)
+  				error = JSON.stringify(JSON.parse(JSON.parse(JSON.stringify(f)).responseText).opaResponse.error['@code'])
+      			$("#progress").append('<p> NAID <a href="https://catalog.archives.gov/id/' + taggednaid.replace('"','') + '">' + taggednaid + '</a>: ' + description + '</p>');
+  			},
+  			dataType: "json"
+});
+}
+
+	function bulktag(tag, naid, level) {
+		$("#bulktag").hide()
+		itemurl = 'https://catalog.archives.gov/api/v1?&exists=objects&type=description&description.item.parent' + level + '.naId=' + naid
+		$.getJSON(itemurl + '&rows=0', function(t) {
+		total = t.opaResponse.results.total
+		count = 0;
+		for (offset = 0; offset < total; offset++) {
+			var tagurl = itemurl + '&tag=' + tag + '&offset=' + offset
+			$("#loggedin").html('<h2>Tagged ' + count + ' descriptions with the tag "<a href="https://catalog.archives.gov/search?q=*:*&filter=(tagsExact:%22' + tag + '%22%20or%20objectTagsExact:%22' + tag + '%22)">' + tag + '</a>".</h2>');
+			post(tagurl)
+			count++;
+		}
+	});
+		if (level === 'Series') {
+			fileurl = 'https://catalog.archives.gov/api/v1?&exists=objects&type=description&description.fileUnit.parent' + level + '.naId=' + naid
+		$.getJSON(fileurl + '&rows=0', function(t) {
+		total = t.opaResponse.results.total
+
+		for (offset = 0; offset < total; offset++) {
+			var tagurl = fileurl + '&tag=' + tag + '&offset=' + offset
+			post(tagurl)
+			$("#loggedin").html('<h2>Tagged ' + count + ' descriptions with the tag "<a href="https://catalog.archives.gov/search?q=*:*&filter=(tagsExact:%22' + tag + '%22%20or%20objectTagsExact:%22' + tag + '%22)">' + tag + '</a>".</h2>');
+			count++;
+		}
+	});
+		}
+	}
+
+	$("#submit").click(function(event){
+		
+		tag = $('#tag').val();
+		naid = $('#naid').val();
+		level = $('#level').val();
+		
+		bulktag(tag, naid, level)
+	});
+	
+	}
+	$("#login").click(function(event){
+		
+		user = $('#user').val();
+		pass = $('#pass').val();
+		
+		login(user, pass)
+	});
+	
+});
+</script>
+</head>
+
+<body>
+<h1 align="center">Automated Tag Assistant</h1>
+<br/>
+<center><span id="loggedin"><h2>Greetings, human! Please log in to begin.</h2><table>
+<tr><td><p>Username: </td><td><input type="search" style="width:200px" id="user" placeholder="username" /></td>
+<td>Password: </td><td><input type="password" style="width:200px" id="pass" placeholder="password" /></td>
+<td><input style="width:75px" type="button" id="login" value="Log in" /></td></tr></table></span>
+<span align="center" id="bulktag" style="display: none"><p>I would like to tag all descriptions with objects belonging to <select id="level"><option value="Series">series</option><option value="FileUnit">file unit</option></select> <input type="search" style="width:150px" id="naid" placeholder="NAID" /> with the tag <input type="search" style="width:150px" id="tag" placeholder="tag" />. <input style="width:75px" type="button" id="submit" value="Submit" /></p></span>
+<span id="progress"></span></center>
+</body>
+</html>
