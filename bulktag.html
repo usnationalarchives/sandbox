@@ -65,7 +65,7 @@ $(document).ready(function() {
 		count = 0;
 		for (offset = 0; offset < total; offset++) {
 			var tagurl = itemurl + '&tag=' + tag + '&offset=' + offset
-			$("#loggedin").html('<h2>Tagged ' + count + ' descriptions with the tag "<a href="https://catalog.archives.gov/search?q=*:*&filter=(tagsExact:%22' + tag + '%22%20or%20objectTagsExact:%22' + tag + '%22)">' + tag + '</a>".</h2>');
+			$("#loggedin").html('<h2>Beep boop. Tagged ' + count + ' descriptions with the tag "<a href="https://catalog.archives.gov/search?q=*:*&filter=(tagsExact:%22' + tag + '%22%20or%20objectTagsExact:%22' + tag + '%22)">' + tag + '</a>".</h2>');
 			post(tagurl)
 			count++;
 		}
@@ -78,7 +78,7 @@ $(document).ready(function() {
 		for (offset = 0; offset < total; offset++) {
 			var tagurl = fileurl + '&tag=' + tag + '&offset=' + offset
 			post(tagurl)
-			$("#loggedin").html('<h2>Tagged ' + count + ' descriptions with the tag "<a href="https://catalog.archives.gov/search?q=*:*&filter=(tagsExact:%22' + tag + '%22%20or%20objectTagsExact:%22' + tag + '%22)">' + tag + '</a>".</h2>');
+			$("#loggedin").html('<h2>Beep boop. Tagged ' + count + ' descriptions with the tag "<a href="https://catalog.archives.gov/search?q=*:*&filter=(tagsExact:%22' + tag + '%22%20or%20objectTagsExact:%22' + tag + '%22)">' + tag + '</a>".</h2>');
 			count++;
 		}
 	});
@@ -115,6 +115,6 @@ $(document).ready(function() {
 <td>Password: </td><td><input type="password" style="width:200px" id="pass" placeholder="password" /></td>
 <td><input style="width:75px" type="button" id="login" value="Log in" /></td></tr></table></span>
 <span align="center" id="bulktag" style="display: none"><p>I would like to tag all descriptions with objects belonging to <select id="level"><option value="Series">series</option><option value="FileUnit">file unit</option></select> <input type="search" style="width:150px" id="naid" placeholder="NAID" /> with the tag <input type="search" style="width:150px" id="tag" placeholder="tag" />. <input style="width:75px" type="button" id="submit" value="Submit" /></p></span>
-<span id="progress"></span></center>
+<span id="progress"><br/><br/><a href="https://catalog.archives.gov/id/6380554"><img src="https://catalog.archives.gov/OpaAPI/media/6380554/content/arcmedia/stillpix/330-cfd/1984/DN-SN-84-01256.jpeg" height="400"></a></span></center>
 </body>
 </html>
