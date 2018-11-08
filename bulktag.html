@@ -37,6 +37,7 @@ $(document).ready(function() {
   			dataType: "json"
 });
 		post = function(url) {
+		$("#robot").hide()
 		$.ajax({
   			type: 'POST',
   			url: url,
@@ -115,6 +116,6 @@ $(document).ready(function() {
 <td>Password: </td><td><input type="password" style="width:200px" id="pass" placeholder="password" /></td>
 <td><input style="width:75px" type="button" id="login" value="Log in" /></td></tr></table></span>
 <span align="center" id="bulktag" style="display: none"><p>I would like to tag all descriptions with objects belonging to <select id="level"><option value="Series">series</option><option value="FileUnit">file unit</option></select> <input type="search" style="width:150px" id="naid" placeholder="NAID" /> with the tag <input type="search" style="width:150px" id="tag" placeholder="tag" />. <input style="width:75px" type="button" id="submit" value="Submit" /></p></span>
-<span id="progress"><br/><br/><a href="https://catalog.archives.gov/id/6380554"><img src="https://catalog.archives.gov/OpaAPI/media/6380554/content/arcmedia/stillpix/330-cfd/1984/DN-SN-84-01256.jpeg" height="400"></a></span></center>
+<br/><br/><a id="robot" href="https://catalog.archives.gov/id/6380554"><img src="https://catalog.archives.gov/OpaAPI/media/6380554/content/arcmedia/stillpix/330-cfd/1984/DN-SN-84-01256.jpeg" height="400"></a><span id="progress"></span></center>
 </body>
 </html>
