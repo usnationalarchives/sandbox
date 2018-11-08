@@ -66,9 +66,9 @@ $(document).ready(function() {
 		count = 0;
 		for (offset = 0; offset < total; offset++) {
 			var tagurl = itemurl + '&tag=' + tag + '&offset=' + offset
-			$("#loggedin").html('<h2>Beep boop. Tagged ' + count + ' descriptions with the tag "<a href="https://catalog.archives.gov/search?q=*:*&filter=(tagsExact:%22' + tag + '%22%20or%20objectTagsExact:%22' + tag + '%22)">' + tag + '</a>".</h2>');
 			post(tagurl)
 			count++;
+			$("#loggedin").html('<h2>Beep boop. Tagged ' + count + ' descriptions with the tag "<a href="https://catalog.archives.gov/search?q=*:*&filter=(tagsExact:%22' + tag + '%22%20or%20objectTagsExact:%22' + tag + '%22)">' + tag + '</a>".</h2>');
 		}
 	});
 		if (level === 'Series') {
@@ -79,8 +79,8 @@ $(document).ready(function() {
 		for (offset = 0; offset < total; offset++) {
 			var tagurl = fileurl + '&tag=' + tag + '&offset=' + offset
 			post(tagurl)
-			$("#loggedin").html('<h2>Beep boop. Tagged ' + count + ' descriptions with the tag "<a href="https://catalog.archives.gov/search?q=*:*&filter=(tagsExact:%22' + tag + '%22%20or%20objectTagsExact:%22' + tag + '%22)">' + tag + '</a>".</h2>');
 			count++;
+			$("#loggedin").html('<h2>Beep boop. Tagged ' + count + ' descriptions with the tag "<a href="https://catalog.archives.gov/search?q=*:*&filter=(tagsExact:%22' + tag + '%22%20or%20objectTagsExact:%22' + tag + '%22)">' + tag + '</a>".</h2>');
 		}
 	});
 		}
