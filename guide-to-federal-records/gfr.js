@@ -81,7 +81,7 @@ $(document).ready(function() {
 				results = results + ' <strong>&mdash;</strong> &nbsp; <a href="' + window.location.pathname + '?' + idparam + '=' + id +'">"<strong>' + title + '</strong>," ' + year_range + '</a><br/> &nbsp; &nbsp; &nbsp; &nbsp; <em>' + idtype + '</em>: <strong>' + id + '</strong>; &nbsp; <em>National Archives Identifier</em>: <a href="https://catalog.archives.gov/id/' + naid + '"><strong>' + naid + '</strong></a><br/> &nbsp; &nbsp; &nbsp; &nbsp; <em>Series count</em>: <strong>' + series_count + '</strong><br/><br/>'
 			}
 			}
-			$('#records').html(results)
+			$('#table').html(results)
 		});
 	}
 	
