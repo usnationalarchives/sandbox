@@ -7,13 +7,34 @@ $(document).ready(function() {
 	
 	if ((params[0].split("=")[0] == 'RG') || (params[0].split("=")[0] == 'collection')) {
 		id = params[0].split("=")
+		refunit = ''
 		try {
-			offset = (params[1].split("=")[1] - 1) * 50
+			if (params[1].split("=")[0] == 'offset') {
+				offsetparam = params[1]
+			}
+		} catch {}
+		try {
+			if (params[2].split("=")[0] == 'offset') {
+				offsetparam = params[2]
+			}
+		}  catch {}
+		try {
+			if (params[1].split("=")[0] == 'refunit') {
+				refunit = params[1].split("=")[1]
+			}
+		} catch {}
+		try {
+			if (params[2].split("=")[0] == 'refunit') {
+				refunit = params[2].split("=")[1]
+			}
+		} catch {}
+		try {
+			offset = (offsetparam[1].split("=")[1] - 1) * 50
 			}
 		catch(err) {
 			offset = 0
 			}
-		loadresults(id, offset)
+		loadresults(id, offset, refunit)
 		}
 	else if (params[0].split("=")[0] == 'keyword') {
 		keyword(params[0].split("=")[1])
@@ -110,23 +131,32 @@ $(document).ready(function() {
 		var startyear = t.opaResponse.results.result[0].description[APItype].inclusiveDates.inclusiveStartDate.year;
 		var endyear = t.opaResponse.results.result[0].description[APItype].inclusiveDates.inclusiveEndDate.year;
 		try {
-			var finding_aid = t.opaResponse.results.result[0].description[APItype].findingAidArray.findingAid.note
+			var finding_aid = '<p><strong>Finding aid</strong>: &nbsp;&nbsp; ' + t.opaResponse.results.result[0].description[APItype].findingAidArray.findingAid.note + '</p>'
 		}
 		catch(err) {
-			var finding_aid = '<em>None</em>'
+			var finding_aid = ''
 		}
 		var series_count = t.opaResponse.results.result[0].description[APItype].seriesCount
 		var reference_unit_array = [];
 		var reference_unit_array = reference_unit_array.concat(t.opaResponse.results.result[0].description[APItype].referenceUnits.referenceUnit)
-		var reference_units = 'Overview of record locations:'
+		var reference_units = 'Overview of record locations (select to filter):'
 		for (n = 0; n < reference_unit_array.length; n++) {
-			var reference_units = reference_units + '<br/>&nbsp;&nbsp;&nbsp;&nbsp;&bull; ' + reference_unit_array[n].name + ' (' + reference_unit_array[n].mailCode + ')'
+			if (reference_unit_array[n].naId == refunit) { 
+				var reference_units = reference_units + '<br/>&nbsp;&nbsp;&nbsp;&nbsp;&bull; <strong><a href="' + window.location.pathname + '?' + params[0] + '=' + params[1] + '&refunit=' + reference_unit_array[n].naId + '">' + reference_unit_array[n].name + ' (' + reference_unit_array[n].mailCode + ')</a></strong>'
 			}
-		$('#front_matter').html('<p align="right"><small><a href="' + window.location.pathname + '">Return to search form</a></small></p><h1>' + title + '</h1><p><strong><a href="https://catalog.archives.gov/id/' + naid + '">' + type + ' ' + id + '</a></strong><br/><em>' + startyear + ' – ' + endyear + '</em><br/><br/><p>This ' + type + ' contains <strong>' + series_count.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '</strong> series.</p>' + reference_units + '</p><h2>Administrative history</h2><p><strong>Established</strong>: &nbsp;&nbsp; ' + startyear + '</p><p><strong>Abolished</strong>: &nbsp;&nbsp; ' + endyear + '</p><p><strong>Finding aid</strong>: &nbsp;&nbsp; ' + finding_aid + '</p>');
+			else {
+				var reference_units = reference_units + '<br/>&nbsp;&nbsp;&nbsp;&nbsp;&bull; <a href="' + window.location.pathname + '?' + params[0] + '=' + params[1] + '&refunit=' + reference_unit_array[n].naId + '">' + reference_unit_array[n].name + ' (' + reference_unit_array[n].mailCode + ')</a>'
+				}
+			}
+		$('#front_matter').html('<p align="right"><small><a href="' + window.location.pathname + '">Return to search form</a></small></p><h1>' + title + '</h1><p><strong><a href="https://catalog.archives.gov/id/' + naid + '">' + type + ' ' + id + '</a></strong><br/><em>' + startyear + ' – ' + endyear + '</em><br/><br/><p>This ' + type + ' contains <strong>' + series_count.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '</strong> series.</p>' + reference_units + '</p><h2>Administrative history</h2><p><strong>Coverage dates for this ' + type + '</strong>: &nbsp;&nbsp; ' + startyear + '&ndash;' + endyear + '</p>');
 
 // Currently, we first query the internal API for all the series in an RG/Collection, and then we make an array of all the series' NAIDs to pass as a query to the public API. We have to do this because (1) the public API fields for parentRecordGroup and parentCollection are not searchable, but (2) the internal API doesn't give us all the data we need. So we use the internal API to get the list of NAIDs, and then query them explicitly instead of querying by parent description. In the future, we'll search "https://catalog.archives.gov/api/v1?rows=10000&description.series.parentRecordGroup.recordGroupNumber="
+if (refunit !== '') {
+	refunit = '&description.series.physicalOccurrenceArray.seriesPhysicalOccurrence.referenceUnitArray.referenceUnit.naId=' + refunit
+	}
+seriesurl = 'https://catalog.archives.gov/api/v1?resultFields=num,naId,description.series.creatingIndividualArray,description.series.creatingOrganizationArray,description.series.physicalOccurrenceArray,description.series.inclusiveDates,description.series.fileUnitCount,description.series.itemCount,description.series.itemAvCount,description.series.title&sort=titleSort asc&rows=50&description.series.parent' + APItype.replace(/^\w/, c => c.toUpperCase()) + '.naId=' + naid + '&offset=' + offset + refunit
 
-$.getJSON('https://catalog.archives.gov/api/v1?resultFields=num,naId,description.series.creatingIndividualArray,description.series.creatingOrganizationArray,description.series.physicalOccurrenceArray,description.series.inclusiveDates,description.series.fileUnitCount,description.series.itemCount,description.series.itemAvCount,description.series.title&sort=titleSort asc&rows=50&description.series.parent' + APItype.replace(/^\w/, c => c.toUpperCase()) + '.naId=' + naid + '&offset=' + offset, function(s){
+$.getJSON(seriesurl, function(s){
 		
 
 		rows = ''
@@ -182,7 +212,12 @@ $.getJSON('https://catalog.archives.gov/api/v1?resultFields=num,naId,description
 			'
 			
 		}
-		$('#table').html('<table width="100%" border="1"><tr><th width="40%" rowspan="2"><center>Series (National Archives Identifier)</center></th><th rowspan="2" width="12%"><center>Date range</center></th><th width="17%" rowspan="2"><center>Extent</center></th><th width="21%" rowspan="2"><center>Location</center></th><th colspan="2"><center>Records</center></th></tr><tr><th width="5%"><center>File units&nbsp; &nbsp;</center></th><th width="5%"><center>&nbsp; &nbsp;Items&nbsp; &nbsp;</center></th></tr>' + rows)
+		unittext = ''
+		series_count = s.opaResponse.results.total
+		if (refunit !== '') {
+			unittext = '<p>Now displaying <strong>' + series_count + '</strong> series from your selected reference unit.</p><br/>'
+		}
+		$('#table').html(unittext + '<table width="100%" border="1"><tr><th width="40%" rowspan="2"><center>Series (National Archives Identifier)</center></th><th rowspan="2" width="12%"><center>Date range</center></th><th width="17%" rowspan="2"><center>Extent</center></th><th width="21%" rowspan="2"><center>Location</center></th><th colspan="2"><center>Records</center></th></tr><tr><th width="5%"><center>File units&nbsp; &nbsp;</center></th><th width="5%"><center>&nbsp; &nbsp;Items&nbsp; &nbsp;</center></th></tr>' + rows)
 		
 		page = (offset / 50) + 1
 	if (series_count > 50) {
