@@ -120,6 +120,10 @@ $(document).ready(function() {
 		}
 		
 	$.getJSON(url, function(t) {
+		if (t.opaResponse.results.total === 0) {
+			$('#front_matter').html('There was no ' + type + '"<strong>' + params[1] + '</strong>" found. <a href="' + window.location.pathname + '">Return to search form</a>.')
+			$('#table').hide()
+			}
 		try {
 			var id = t.opaResponse.results.result[0].description.recordGroup.recordGroupNumber
 			}
