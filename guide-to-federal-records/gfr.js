@@ -172,8 +172,18 @@ $(document).ready(function() {
 			}
 		var naid = t.opaResponse.results.result[0].naId;
 		var title = t.opaResponse.results.result[0].description[APItype].title;
-		var startyear = t.opaResponse.results.result[0].description[APItype].inclusiveDates.inclusiveStartDate.year;
-		var endyear = t.opaResponse.results.result[0].description[APItype].inclusiveDates.inclusiveEndDate.year;
+		try {
+			startyear = t.opaResponse.results.result[n].description[level].inclusiveDates.inclusiveStartDate.year
+		}
+		catch(err) {
+			startyear = '?'
+		}
+		try {
+			endyear = t.opaResponse.results.result[n].description[level].inclusiveDates.inclusiveEndDate.year
+		}
+		catch(err) {
+			endyear = '?'
+		}
 		try {
 			var finding_aid = '<p><strong>Finding aid</strong>: &nbsp;&nbsp; ' + t.opaResponse.results.result[0].description[APItype].findingAidArray.findingAid.note + '</p>'
 		}
