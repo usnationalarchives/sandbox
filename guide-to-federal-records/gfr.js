@@ -37,7 +37,12 @@ $(document).ready(function() {
 		loadresults(id, offset, refunit)
 		}
 	else if (params[0].split("=")[0] == 'keyword') {
-		keyword(params[0].split("=")[1])
+		if (params[1] == 'level=series'){
+		keyword(params[0].split("=")[1], params[1].split("=")[1])
+		}
+		else {
+		keyword(params[0].split("=")[1], '')
+		}
 	}
 	else {
 		$('#hide').show();
@@ -57,12 +62,21 @@ $(document).ready(function() {
 		$('#kyinput').click();
 		});
 	
-	function keyword(keyword) {
-		
-		var url = 'https://catalog.archives.gov/api/v1?rows=10000&resultTypes=recordGroup,collection&q=' + keyword;
+	function keyword(keyword, level) {
+		load();
+		if (level === 'series'){
+		var url = 'https://catalog.archives.gov/api/v1?rows=1000&resultTypes=series&resultFields=num,naId,description.series.title,description.series.parentCollection,description.series.parentRecordGroup&q=' + keyword;
+		}
+		else {
+		var url = 'https://catalog.archives.gov/api/v1?rows=1000&resultTypes=recordGroup,collection&q=' + keyword;
+		}
 		$.getJSON(url, function(t) {
  			if (t.opaResponse.results.total > 0) {
- 				$('#front_matter').html('<p align="right"><small><a href="' + window.location.pathname + '">Return to search form</a></small></p>Displaying <strong>' + t.opaResponse.results.total + '</strong> results for this search, sorted automatically by relevance:<br/><br/>');
+ 				seriestext = ''
+ 				if (level !== 'series') {
+ 					seriestext = '<p>You are currently searching only the text found in record group and collection descriptions. Didn\'t find what you\'re looking for? <strong><a href="' + window.location.pathname + '?keyword=' + keyword + '&level=series">Search series data as well</a>.'
+ 					}
+ 				$('#front_matter').html('<p align="right"><small><a href="' + window.location.pathname + '">Return to search form</a></small></p></strong></p>' + seriestext + '<p>Displaying <strong>' + t.opaResponse.results.total + '</strong> results for this search, sorted automatically by relevance:</p>');
  			}
 			else {
 				$('#front_matter').html('<p align="right"><small><a href="' + window.location.pathname + '">Return to search form</a></small></p>There are <strong>0</strong> results for this search. Please try again.')
@@ -71,19 +85,7 @@ $(document).ready(function() {
 		if (t.opaResponse.results.total > 0) {
 			for (n = 0; n < t.opaResponse.results.result.length; n++) { 
 				
-				naid = t.opaResponse.results.result[n].naId;
 				level = Object.keys(t.opaResponse.results.result[n].description)[0];
-				if (level == 'collection') {
-					id = t.opaResponse.results.result[n].description[level].collectionIdentifier;
-					idtype = 'Collection Identifier';
-					idparam = 'collection'
-					}
-				else {
-					id = t.opaResponse.results.result[n].description[level].recordGroupNumber;
-					idtype = 'Record Group Number';
-					idparam = 'RG'
-				}
-				title = t.opaResponse.results.result[n].description[level].title;
 				try {
 					start_year = t.opaResponse.results.result[n].description[level].inclusiveDates.inclusiveStartDate.year
 				}
@@ -97,9 +99,47 @@ $(document).ready(function() {
 					end_year = 'present'
 				}
 				year_range = start_year + ' – ' + end_year;
-				series_count = t.opaResponse.results.result[n].description[level].seriesCount;
+				series = '<em>Series count</em>: <strong>' + t.opaResponse.results.result[n].description[level].seriesCount + '</strong>'
+				if (level == 'collection') {
+					id = t.opaResponse.results.result[n].description[level].collectionIdentifier;
+					idtype = 'Collection Identifier';
+					idparam = 'collection'
+					title = t.opaResponse.results.result[n].description[level].title
+					naid = t.opaResponse.results.result[n].naId;
+					}
+				if (level == 'recordGroup') {
+					id = t.opaResponse.results.result[n].description[level].recordGroupNumber;
+					idtype = 'Record Group Number';
+					idparam = 'RG'
+					title = t.opaResponse.results.result[n].description[level].title
+					naid = t.opaResponse.results.result[n].naId
+				}
 				
-				results = results + ' <strong>&mdash;</strong> &nbsp; <a href="' + window.location.pathname + '?' + idparam + '=' + id +'">"<strong>' + title + '</strong>," ' + year_range + '</a><br/> &nbsp; &nbsp; &nbsp; &nbsp; <em>' + idtype + '</em>: <strong>' + id + '</strong>; &nbsp; <em>National Archives Identifier</em>: <a href="https://catalog.archives.gov/id/' + naid + '"><strong>' + naid + '</strong></a><br/> &nbsp; &nbsp; &nbsp; &nbsp; <em>Series count</em>: <strong>' + series_count + '</strong><br/><br/>'
+				else if (level == 'series') {
+					try {
+						id = t.opaResponse.results.result[n].description[level].parentCollection.collectionIdentifier
+						idtype = 'Collection Identifier'
+						idparam = 'collection'
+						title = t.opaResponse.results.result[n].description[level].parentCollection.title
+						seriestitle = t.opaResponse.results.result[n].description[level].title
+						seriestitle = t.opaResponse.results.result[n].description[level].title
+						seriesnaid = t.opaResponse.results.result[n].naId
+						series = '<em>Term found in series</em>: "<strong><a href="https://catalog.archives.gov/id/' + seriesnaid + '">' + seriestitle + '</a></strong>"'
+						naid = t.opaResponse.results.result[n].description[level].parentCollection.naId
+					} catch(err) {
+						id = t.opaResponse.results.result[n].description[level].parentRecordGroup.recordGroupNumber
+						idtype = 'Record Group Number'
+						idparam = 'RG'
+						title = t.opaResponse.results.result[n].description[level].parentRecordGroup.title
+						seriestitle = t.opaResponse.results.result[n].description[level].title
+						seriestitle = t.opaResponse.results.result[n].description[level].title
+						seriesnaid = t.opaResponse.results.result[n].naId
+						series = '<em>Term found in series</em>: "<strong><a href="https://catalog.archives.gov/id/' + seriesnaid + '">' + seriestitle + '</a></strong>"'
+						naid = t.opaResponse.results.result[n].description[level].parentRecordGroup.naId
+						}
+				}
+				
+				results = results + ' <strong>&mdash;</strong> &nbsp; <a href="' + window.location.pathname + '?' + idparam + '=' + id +'">"<strong>' + title + '</strong>," ' + year_range + '</a><br/> &nbsp; &nbsp; &nbsp; &nbsp; <em>' + idtype + '</em>: <strong>' + id + '</strong>; &nbsp; <em>National Archives Identifier</em>: <a href="https://catalog.archives.gov/id/' + naid + '"><strong>' + naid + '</strong></a><br/> &nbsp; &nbsp; &nbsp; &nbsp; ' + series + '<br/><br/>'
 			}
 			}
 			$('#table').html(results)
