@@ -74,7 +74,7 @@ $(document).ready(function() {
  			if (t.opaResponse.results.total > 0) {
  				seriestext = ''
  				if (level !== 'series') {
- 					seriestext = '<p>You are currently searching only the text found in record group and collection descriptions. Didn\'t find what you\'re looking for? <strong><a href="' + window.location.pathname + '?keyword=' + keyword + '&level=series">Search series data as well</a>.'
+ 					seriestext = '<p>You are currently searching only the text found in record group and collection descriptions. Didn\'t find what you\'re looking for? <strong><a href="' + window.location.pathname + '?keyword=' + keyword + '&level=series">Search using data from the series instead</a>.'
  					}
  				$('#front_matter').html('<p align="right"><small><a href="' + window.location.pathname + '">Return to search form</a></small></p></strong></p>' + seriestext + '<p>Displaying <strong>' + t.opaResponse.results.total + '</strong> results for this search, sorted automatically by relevance:</p>');
  			}
