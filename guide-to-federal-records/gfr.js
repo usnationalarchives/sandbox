@@ -144,8 +144,8 @@ $(document).ready(function() {
 			}
 			}
 			$('#table').html(results)
-			$('#searchnext').show();
-			if (start*50 >= t.opaResponse.results.total) { $('#searchnext').hide(); }
+			if (start*50+50 >= t.opaResponse.results.total) { $('#searchnext').hide(); }
+			else {$('#searchnext').show();}
 		});
 	}
 	
