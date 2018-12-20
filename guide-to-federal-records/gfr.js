@@ -38,10 +38,10 @@ $(document).ready(function() {
 		}
 	else if (params[0].split("=")[0] == 'keyword') {
 		if (params[1] == 'level=series'){
-		keyword(params[0].split("=")[1], params[1].split("=")[1])
+		keyword(params[0].split("=")[1], params[1].split("=")[1], start)
 		}
 		else {
-		keyword(params[0].split("=")[1], '')
+		keyword(params[0].split("=")[1], '', start)
 		}
 	}
 	else {
@@ -61,14 +61,15 @@ $(document).ready(function() {
 		if(enter.keyCode==13)
 		$('#kyinput').click();
 		});
+		
 	
-	function keyword(keyword, level) {
+	function keyword(keyword, level, start) {
 		load();
 		if (level === 'series'){
-		var url = 'https://catalog.archives.gov/api/v1?rows=1000&resultTypes=series&resultFields=num,naId,description.series.title,description.series.parentCollection,description.series.parentRecordGroup&q=' + keyword;
+		var url = 'https://catalog.archives.gov/api/v1?rows=50&resultTypes=series&resultFields=num,naId,description.series.title,description.series.parentCollection,description.series.parentRecordGroup&q=' + keyword + '&offset=' + start*50;
 		}
 		else {
-		var url = 'https://catalog.archives.gov/api/v1?rows=1000&resultTypes=recordGroup,collection&q=' + keyword;
+		var url = 'https://catalog.archives.gov/api/v1?rows=50&resultTypes=recordGroup,collection&q=' + keyword + '&offset=' + start*50;
 		}
 		$.getJSON(url, function(t) {
  			if (t.opaResponse.results.total > 0) {
@@ -143,6 +144,8 @@ $(document).ready(function() {
 			}
 			}
 			$('#table').html(results)
+			$('#searchnext').show();
+			if (start*50 >= t.opaResponse.results.total) { $('#searchnext').hide(); }
 		});
 	}
 	
@@ -161,7 +164,7 @@ $(document).ready(function() {
 		
 	$.getJSON(url, function(t) {
 		if (t.opaResponse.results.total === 0) {
-			$('#front_matter').html('There was no ' + type + '"<strong>' + params[1] + '</strong>" found. <a href="' + window.location.pathname + '">Return to search form</a>.')
+			$('#front_matter').html('There was no ' + type + ' "<strong>' + params[1] + '</strong>" found. <a href="' + window.location.pathname + '">Return to search form</a>.')
 			$('#table').hide()
 			}
 		try {
@@ -402,4 +405,26 @@ window.setInterval((function(){
 		window.location.href = newUrl;
 	
 	});
+	start = 0;
+	$("#nextpage").click(function(event){
+		start = start + 1;
+		if (params[1] == 'level=series'){
+		keyword(params[0].split("=")[1], params[1].split("=")[1], start)
+		}
+		else {
+		keyword(params[0].split("=")[1], '', start)
+		}
+		$('#searchprev').show();
+	});
+	$("#prevpage").click(function(event){
+		start = start - 1
+		if (params[1] == 'level=series'){
+		keyword(params[0].split("=")[1], params[1].split("=")[1], start)
+		}
+		else {
+		keyword(params[0].split("=")[1], '', start)
+		}
+		if (start = 0) { $('#searchprev').hide();}
+	});
+	
  });
