@@ -176,13 +176,13 @@ $(document).ready(function() {
 		var naid = t.opaResponse.results.result[0].naId;
 		var title = t.opaResponse.results.result[0].description[APItype].title;
 		try {
-			startyear = t.opaResponse.results.result[0].description[level].inclusiveDates.inclusiveStartDate.year
+			startyear = t.opaResponse.results.result[0].description[APItype].inclusiveDates.inclusiveStartDate.year
 		}
 		catch(err) {
 			startyear = '?'
 		}
 		try {
-			endyear = t.opaResponse.results.result[0].description[level].inclusiveDates.inclusiveEndDate.year
+			endyear = t.opaResponse.results.result[0].description[APItype].inclusiveDates.inclusiveEndDate.year
 		}
 		catch(err) {
 			endyear = '?'
