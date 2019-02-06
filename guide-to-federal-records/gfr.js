@@ -9,12 +9,12 @@ $(document).ready(function() {
 		id = params[0].split("=")
 		refunit = ''
 		try {
-			if (params[1].split("=")[0] == 'offset') {
+			if (params[1].split("=")[0] == 'page') {
 				offsetparam = params[1]
 			}
 		} catch {}
 		try {
-			if (params[2].split("=")[0] == 'offset') {
+			if (params[2].split("=")[0] == 'page') {
 				offsetparam = params[2]
 			}
 		}  catch {}
@@ -29,7 +29,7 @@ $(document).ready(function() {
 			}
 		} catch {}
 		try {
-			offset = (offsetparam[1].split("=")[1] - 1) * 50
+			offset = (offsetparam.split("=")[1] - 1) * 50
 			}
 		catch(err) {
 			offset = 0
@@ -205,7 +205,7 @@ $(document).ready(function() {
 				var reference_units = reference_units + '<br/>&nbsp;&nbsp;&nbsp;&nbsp;&bull; <a href="' + window.location.pathname + '?' + params[0] + '=' + params[1] + '&refunit=' + reference_unit_array[n].naId + '">' + reference_unit_array[n].name + ' (' + reference_unit_array[n].mailCode + ')</a>'
 				}
 			}
-		$('#front_matter').html('<p align="right"><small><a href="' + window.location.pathname + '">Return to search form</a></small></p><h1>' + title + '</h1><p><strong><a href="https://catalog.archives.gov/id/' + naid + '">' + type + ' ' + id + '</a></strong><br/><em>' + startyear + ' – ' + endyear + '</em><br/><br/><p>This ' + type + ' contains <strong>' + series_count.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '</strong> series.</p>' + reference_units + '</p><h2>Administrative history</h2><p><strong>Coverage dates for this ' + type + '</strong>: &nbsp;&nbsp; ' + startyear + '&ndash;' + endyear + '</p>');
+		$('#front_matter').html('<p align="right"><small><a href="' + window.location.pathname + '">Return to search form</a></small></p><h1>' + title + '</h1><p><strong><a href="https://catalog.archives.gov/id/' + naid + '">' + type + ' ' + id + '</a></strong><br/><em>' + startyear + ' – ' + endyear + '</em><br/><br/><p>This ' + type + ' contains <strong>' + series_count.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '</strong> series.</p>' + reference_units + '</p><h2>Administrative history</h2><p><strong>Records in this ' + type + ' cover the following dates</strong>: &nbsp;&nbsp; ' + startyear + '&ndash;' + endyear + '</p>');
 
 // Currently, we first query the internal API for all the series in an RG/Collection, and then we make an array of all the series' NAIDs to pass as a query to the public API. We have to do this because (1) the public API fields for parentRecordGroup and parentCollection are not searchable, but (2) the internal API doesn't give us all the data we need. So we use the internal API to get the list of NAIDs, and then query them explicitly instead of querying by parent description. In the future, we'll search "https://catalog.archives.gov/api/v1?rows=10000&description.series.parentRecordGroup.recordGroupNumber="
 if (refunit !== '') {
