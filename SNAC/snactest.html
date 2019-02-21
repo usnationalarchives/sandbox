@@ -1,0 +1,105 @@
+<html>
+<head>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script type="text/javascript" language="javascript">
+
+$(document).ready(function() {
+arks = [
+'w6dw2811',
+'w69706n1',
+'w65f9g02',
+'w6bk2190',
+'w61p8q7w',
+'w6wx86s1',
+'w6s57g1k',
+'w6nd6q9v',
+'w63b91rw',
+'w6v706t7',
+'w6r80b10',
+'w6222w4f',
+'w6hr4p19',
+'w69k5sv3',
+'w6d03x8f',
+'w68735kj',
+'w6qs5m3z',
+'w6db86dw',
+'w64g2dsx',
+'w6r60dvw',
+'w6mh8cjb',
+'w6gr7mv2',
+'w6c06w42',
+'w6r030v0',
+'w67764dq',
+'w6nm43z7',
+'w63p2sfr',
+'w63g5cp0',
+'w6sk28kh',
+'w6zq4w6q',
+'w6747dv6',
+'w6df7swv',
+'w6tz44ht',
+'w647490q',
+'w6dc8qwq',
+'w6qz2f8q',
+'w6rp0z78',
+'w6q9235p',
+'w63k42x2',
+'w6wx86n7',
+'w6tv5dz9',]
+
+	function image(id) {
+
+		$.ajax({
+		  url: 'https://query.wikidata.org/sparql?format=json&query=SELECT%20?_image%20WHERE%20{?q%20wdt:P3430%20%22' + id + '%22.OPTIONAL%20{%20?q%20wdt:P18%20?_image.}}',
+		  async: false,
+		  dataType: 'json',
+		  success: function (data) {
+			image = data['results']['bindings'][0]['_image']['value'];
+		  }
+		});
+		return image
+	}
+
+	function query() {
+		id = arks[Math.floor(Math.random()*arks.length)]
+		$.ajax({
+			url: 'http://api.snaccooperative.org/',
+			method: 'PUT',
+			contentType: 'json',
+			data : '{ "command": "read", "arkid": "http://n2t.net/ark:/99166/' + id + '" }',
+			success: function(result) {
+				
+				link = result['constellation']['ark']
+				name = result['constellation']['nameEntries'][0]['original']
+				born = result['constellation']['dates'][0]['fromDate']
+				died = result['constellation']['dates'][0]['toDate']
+				image = image(id)
+				biog = result['constellation']['biogHists'][0]['text']
+				otherids = result['constellation']['otherRecordIDs']
+				links = ''
+				for (f = 0; f < otherids.length; f++) {
+					if (otherids[f]['type']['id'] === '28225') {
+						links = links + '\
+<li><a href="' + otherids[f]['uri'] + '">' + otherids[f]['uri'] + '</a></li>'
+					}
+				}
+				
+
+				$('#text').html('<strong><img height="200" src="' + image + '"/><p><a href="' + link + '">' + name + '</a></strong><br/>Born: ' + born + '<br/>Died: ' + died + '<br/><br/><em>Biographical history</em>:<br/>' + biog + '<br/><br/><em>External resources</em>:<br/><ul><li><a href="http://n2t.net/ark:/99166/' + id + '">Social Networks and Archival Context</a></li>' + links + '</ul></p>')
+			},
+			error: function(request,msg,error) {
+				// handle failure
+			}
+		});	
+	}
+
+	query();
+
+})
+</script>
+</script>
+</head>
+<body>
+<span id="text">Loading...</span>
+</body>
+</html>
