@@ -57,7 +57,7 @@ arks = [
 			image = data['results']['bindings'][0]['_image']['value'];
 		  }
 		});
-		return image
+		return image.replace('http:', 'https:')
 	}
 
 	function query() {
