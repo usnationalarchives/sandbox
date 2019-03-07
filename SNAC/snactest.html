@@ -63,7 +63,7 @@ arks = [
 	function query() {
 		id = arks[Math.floor(Math.random()*arks.length)]
 		$.ajax({
-			url: 'http://api.snaccooperative.org/',
+			url: 'https://api.snac.qa.drupalme.net/',
 			method: 'PUT',
 			contentType: 'json',
 			data : '{ "command": "read", "arkid": "http://n2t.net/ark:/99166/' + id + '" }',
