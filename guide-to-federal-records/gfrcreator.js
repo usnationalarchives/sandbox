@@ -271,20 +271,33 @@ $(document).ready(function() {
 if (refunit !== '') {
 	refunit = '&description.series.physicalOccurrenceArray.seriesPhysicalOccurrence.referenceUnitArray.referenceUnit.naId=' + refunit
 	}
-	table = '<table width="100%" border="1"><tr><th width="30%" rowspan="2"><center>Series</center></th><th width="10%" rowspan="2"><center>National Archives Identifier</center></th><th rowspan="2" width="12%"><center>Date range</center></th><th width="17%" rowspan="2"><center>Extent</center></th><th width="21%" rowspan="2"><center>Location</center></th><th colspan="2"><center>Records</center></th></tr><tr><th width="5%"><center>File units&nbsp; &nbsp;</center></th><th width="5%"><center>&nbsp; &nbsp;Items&nbsp; &nbsp;</center></th></tr>'
+	table = '<button style="color: darkblue" id="showall">[&#x25BC;expand all]</button>'
 	for (b = 0; b < sortedcreators.length; b++) {
+	table = table + '<table width="100%" border="1">'
 seriesurl = 'https://catalog.archives.gov/api/v1?description.series.creatingOrganizationArray.creatingOrganization.creator.naId=' + sortedcreators[b][1] + '&resultFields=num,naId,description.series.creatingIndividualArray,description.series.creatingOrganizationArray,description.series.physicalOccurrenceArray,description.series.inclusiveDates,description.series.fileUnitCount,description.series.itemCount,description.series.itemAvCount,description.series.title&sort=titleSort asc&rows=50&description.series.parent' + APItype.replace(/^\w/, c => c.toUpperCase()) + '.naId=' + naid + '&offset=' + offset + refunit
 
-table = table + '<tr><th width="100%" colspan="7"><br/><center><a href="https://catalog.archives.gov/id/' + sortedcreators[b][1] + '">' + sortedcreators[b][0] + '</a></center><br/></th></tr>'
-		table = table + loadcreator(seriesurl)
+table = table + '<tr><th width="100%" colspan="7"><br/><center><a href="https://catalog.archives.gov/id/' + sortedcreators[b][1] + '">' + sortedcreators[b][0] + '</a></center><button style="color: darkblue" class="showseries" value="' + sortedcreators[b][1] + '">[&#x25BC;expand]</button></th></tr></table><table style="display: none" width="100%" border="1" class="showheader" id="' + sortedcreators[b][1] +'" ><tr><th width="30%" rowspan="2"><center>Series</center></th><th width="10%" rowspan="2"><center>National Archives Identifier</center></th><th rowspan="2" width="12%"><center>Date range</center></th><th width="17%" rowspan="2"><center>Extent</center></th><th width="21%" rowspan="2"><center>Location</center></th><th colspan="2"><center>Records</center></th></tr><tr><th width="5%"><center>File units&nbsp; &nbsp;</center></th><th width="5%"><center>&nbsp; &nbsp;Items&nbsp; &nbsp;</center></th></tr>'
+		newtablecontent = ''
+        newtablecontent = loadcreator(seriesurl)
+		table = table + newtablecontent + '</table>'
 		}
 	
-	$('#table').html(table + '</table>')
-		
+	$('#table').html(table)
+
 	});
 	}
+		$(document).on('click', ".showseries", function() {
+			$("#" + $(this).attr("value")).show()
+		});
+		
+		$(document).on('click', "#showall", function() {
+			for (z=0;z<sortedcreators.length;z++) {
+				$("#" + sortedcreators[z][1]).show()
+			}
+		});
+	
 		function loadcreator(seriesurl) {
-		table = ''
+		addtable = ''
 		$.ajax({
 			url: seriesurl,
 			method: 'GET',
@@ -350,12 +363,12 @@ table = table + '<tr><th width="100%" colspan="7"><br/><center><a href="https://
 			result_fileunits = s.opaResponse.results.result[n].description.series.fileUnitCount;
 			result_items = Number(s.opaResponse.results.result[n].description.series.itemCount) + Number(s.opaResponse.results.result[n].description.series.itemAvCount)
 
-			table = table + '\
+			addtable = addtable + '\
 			<tr width="100%" style="border: 0" valign="mid"><td width="30%"><strong><a href="https://catalog.archives.gov/id/' + result_naid + '">' + result_title + '</a></td><td width="10%"><center>' + result_naid + '</center></td><td width="12%">' + result_startyear + ' – ' + result_endyear + '</td><td width="17%">' + result_extent + '</td><td width="21%">' + result_referenceunit + '</td><td width="5%"><center>' + result_fileunits + '</center></td><td width="5%"><center>' + result_items + '</center></td></tr>\
 			'
 			
 		}
-		return table
+		return addtable
 		unittext = ''
 		series_count = s.opaResponse.results.total
 		if (refunit !== '') {
@@ -446,7 +459,7 @@ table = table + '<tr><th width="100%" colspan="7"><br/><center><a href="https://
 	}
 	}
 		});
-		return table
+		return addtable
 		}
 load = function() {
 $('#table').html('<center><img width="300px" src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Lightness_rotate_36f_cw.gif"> <h1>Loading time: <span id="seconds"></span> seconds.</h1></center>')
